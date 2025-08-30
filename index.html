@@ -3,828 +3,619 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>City Ledger — Pass & Play (Live Economy)</title>
+<title>City Ledger — Live Economy</title>
+
+<!-- iOS PWA -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="City Ledger">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0b0b0b">
+
 <style>
-  :root {
-    --bg:#0a0a0a; --panel:#121212; --card:#151515; --ink:#eaeaea; --muted:#a9a9a9;
-    --accent:#4dd2ff; --good:#35d07f; --warn:#ff6b6b; --edge:#242424; --shadow:0 10px 28px rgba(0,0,0,.35);
-  }
-  html,body{height:100%;background:var(--bg);color:var(--ink);font-family:-apple-system,system-ui,Segoe UI,Roboto,Inter,Arial}
-  *{box-sizing:border-box}
-  .app{display:grid;grid-template-columns:1fr 420px;gap:12px;padding:12px;min-height:100vh}
-  @media (max-width:1100px){.app{grid-template-columns:1fr}.right{order:-1}}
-  .panel{background:var(--panel);border:1px solid var(--edge);border-radius:16px;box-shadow:var(--shadow)}
-  .boardWrap{display:grid;place-items:center}
-  .board{width:min(94vh,1100px);aspect-ratio:1;background:#0f0f0f;border-radius:16px;border:1px solid #222;display:grid;grid-template-columns:repeat(11,1fr);grid-template-rows:repeat(11,1fr);gap:4px;padding:8px;position:relative}
-  .tile{background:#121212;border:1px solid #222;border-radius:10px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:11px;padding:6px;position:relative;cursor:pointer}
-  .tile .price{position:absolute;bottom:4px;left:0;right:0;color:var(--muted);font-size:10px}
-  .bar{position:absolute;top:0;left:0;right:0;height:6px;border-top-left-radius:10px;border-top-right-radius:10px}
-  .center{grid-column:2/11;grid-row:2/11;border:1px dashed #222;border-radius:12px;display:grid;place-items:center}
-  .center h1{margin:0;letter-spacing:.06em}
-  .token{position:absolute;width:18px;height:18px;border-radius:50%;border:2px solid #000;transform:translate(-50%,-50%)}
-  .right{display:grid;grid-template-rows:auto auto 1fr auto;gap:12px;padding:12px}
-  .card{background:var(--card);border:1px solid var(--edge);border-radius:12px;padding:10px}
-  .row{display:flex;align-items:center;justify-content:space-between;gap:8px}
-  .btn{appearance:none;background:#1b1b1b;color:var(--ink);border:1px solid var(--edge);padding:10px 12px;border-radius:12px;cursor:pointer}
-  .btn.primary{background:var(--accent);color:#00131a;border-color:transparent;font-weight:700}
-  .btn.good{background:var(--good);color:#00150a;border-color:transparent;font-weight:700}
-  .btn.warn{background:var(--warn);color:#220000;border-color:transparent;font-weight:700}
-  input,select{background:#101010;color:var(--ink);border:1px solid var(--edge);border-radius:10px;padding:10px}
-  .log{height:180px;overflow:auto;background:#0f0f0f;border:1px solid #252525;border-radius:8px;padding:8px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;line-height:1.35}
-  .tag{color:var(--muted);font-size:12px}
-  .mini{color:var(--muted);font-size:12px;margin-top:6px}
-  .owner{position:absolute;right:6px;bottom:6px;width:10px;height:10px;border:1px solid #000;border-radius:50%}
-  /* token colors */
-  .t0{background:#ffd452}.t1{background:#7bd1ff}.t2{background:#ff9ae0}.t3{background:#7dff9a}.t4{background:#ff9b7b}.t5{background:#c99bff}
-  /* set colors */
-  .br{background:#7b4a2e}.lb{background:#9ed6ff}.pk{background:#ff9ad6}.or{background:#ffa552}
-  .rd{background:#ff6b6b}.yl{background:#ffe066}.gr{background:#7adf88}.bl{background:#6ca8ff}
-  /* modal */
-  .modal{position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,.55);z-index:50}
-  .modal.open{display:grid}
-  .sheet{background:var(--panel);border:1px solid var(--edge);border-radius:16px;min-width:min(540px,94vw);max-width:94vw;padding:16px}
-  .sheet h3{margin:0 0 6px 0}
-  .sheet .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-  /* overlay for pass */
-  .pass{position:fixed;inset:0;background:#000;color:#fff;display:none;z-index:60;align-items:center;justify-content:center;text-align:center;padding:24px}
-  .pass.open{display:flex}
+:root{
+  --bg:#0b0b0b;--panel:#121212;--ink:#f2f2f2;--mut:#a8a8a8;--edge:#242424;--accent:#4dd2ff;
+  --good:#35d07f;--warn:#ff6b6b;--card:#151515;--shadow:0 12px 30px rgba(0,0,0,.35)
+}
+*{box-sizing:border-box} html,body{height:100%;background:var(--bg);color:var(--ink);font-family:-apple-system,system-ui,Inter,Roboto,Arial}
+a{color:var(--accent);text-decoration:none}
+.app{min-height:100vh;display:grid;grid-template-rows:auto 1fr}
+.topbar{padding:10px 14px;border-bottom:1px solid var(--edge);background:rgba(0,0,0,.35);backdrop-filter:blur(6px);position:sticky;top:0;z-index:20}
+.brand{font-weight:700;letter-spacing:.04em}
+.screen{display:none}
+.screen.active{display:block}
+.container{max-width:1200px;margin:0 auto;padding:16px}
+.grid{display:grid;gap:12px}
+.panel{background:var(--panel);border:1px solid var(--edge);border-radius:16px;box-shadow:var(--shadow);padding:16px}
+
+.btn{appearance:none;border:1px solid var(--edge);background:#1b1b1b;color:var(--ink);padding:12px 14px;border-radius:12px;cursor:pointer;font-size:16px}
+.btn.primary{background:var(--accent);border-color:transparent;color:#00121a;font-weight:700}
+.btn.good{background:var(--good);border-color:transparent;color:#00150a;font-weight:700}
+.btn.warn{background:var(--warn);border-color:transparent;color:#2a0000;font-weight:700}
+.btn.ghost{background:transparent;border:1px dashed var(--edge)}
+
+.input, select{width:100%;background:#0f0f0f;border:1px solid var(--edge);color:var(--ink);border-radius:12px;padding:12px 14px}
+.row{display:flex;gap:10px;align-items:center}
+.row.spread{justify-content:space-between}
+.tag{color:var(--mut);font-size:12px}
+.h1{font-size:28px;font-weight:800;margin:0}
+.h2{font-size:20px;font-weight:700;margin:0}
+.hint{color:var(--mut);font-size:13px;margin-top:6px}
+
+/* Home */
+.hero{display:grid;gap:16px;place-items:center;text-align:center;padding:48px 12px}
+.heroTitle{font-size:36px;font-weight:900;letter-spacing:.06em}
+.heroSub{color:var(--mut)}
+
+/* Setup Wizard */
+.wizard{display:grid;grid-template-columns:1fr 420px;gap:12px}
+@media (max-width:1100px){.wizard{grid-template-columns:1fr}}
+.stepTitle{margin-bottom:8px}
+.list{display:grid;gap:8px}
+.item{display:flex;justify-content:space-between;gap:10px;align-items:center;background:var(--card);border:1px solid var(--edge);padding:10px;border-radius:12px}
+
+/* Game */
+.play{display:grid;grid-template-columns:1fr 420px;gap:12px}
+@media (max-width:1100px){.play{grid-template-columns:1fr}}
+.boardWrap{display:grid;place-items:center}
+.board{width:min(94vh,1100px);aspect-ratio:1;background:#0f0f0f;border-radius:16px;border:1px solid #222;display:grid;grid-template-columns:repeat(11,1fr);grid-template-rows:repeat(11,1fr);gap:4px;padding:8px;position:relative}
+.tile{background:#121212;border:1px solid #222;border-radius:10px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:11px;padding:6px;position:relative;cursor:pointer}
+.bar{position:absolute;top:0;left:0;right:0;height:6px;border-top-left-radius:10px;border-top-right-radius:10px}
+.price{position:absolute;bottom:4px;left:0;right:0;color:var(--mut);font-size:10px}
+.owner{position:absolute;right:6px;bottom:6px;width:10px;height:10px;border-radius:50%;border:1px solid #000}
+.center{grid-column:2/11;grid-row:2/11;border:1px dashed #222;border-radius:12px;display:grid;place-items:center}
+.token{position:absolute;width:18px;height:18px;border-radius:50%;border:2px solid #000;transform:translate(-50%,-50%)}
+
+.sidebar{display:grid;grid-template-rows:auto auto 1fr auto;gap:12px}
+.card{background:var(--card);border:1px solid var(--edge);border-radius:12px;padding:12px}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.actions .btn{font-size:15px}
+.log{height:180px;overflow:auto;background:#0f0f0f;border:1px solid #252525;border-radius:8px;padding:8px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;line-height:1.35}
+
+/* Modals + Pass overlay */
+.modal{position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,.55);z-index:50}
+.modal.open{display:grid}
+.sheet{background:var(--panel);border:1px solid var(--edge);border-radius:16px;min-width:min(560px,94vw);max-width:94vw;padding:16px}
+.sheet h3{margin:0 0 6px 0}
+.sheet .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.pass{position:fixed;inset:0;background:#000;color:#fff;display:none;z-index:60;align-items:center;justify-content:center;text-align:center;padding:24px}
+.pass.open{display:flex}
+
+/* set colors */
+.br{background:#7b4a2e}.lb{background:#9ed6ff}.pk{background:#ff9ad6}.or{background:#ffa552}
+.rd{background:#ff6b6b}.yl{background:#ffe066}.gr{background:#7adf88}.bl{background:#6ca8ff}
+/* token colors */
+.t0{background:#ffd452}.t1{background:#7bd1ff}.t2{background:#ff9ae0}.t3{background:#7dff9a}.t4{background:#ff9b7b}.t5{background:#c99bff}
 </style>
 </head>
 <body>
 <div class="app">
-  <div class="panel boardWrap">
-    <div id="board" class="board"></div>
+
+  <div class="topbar row spread">
+    <div class="brand">City Ledger</div>
+    <div class="tag" id="statusTop">Ready</div>
   </div>
-  <aside class="panel right">
-    <div class="card">
-      <div class="row">
-        <div><strong>City Ledger</strong> <span class="tag">v0.9 • Live Economy</span></div>
-        <div class="tag" id="macroTag">Inflation 2.0% • Rate 3.5%</div>
+
+  <!-- ---------- HOME ---------- -->
+  <section id="home" class="screen active">
+    <div class="container">
+      <div class="panel hero">
+        <div class="heroTitle">LIVE ECONOMY. CLEAN UI. REAL CHAOS.</div>
+        <div class="heroSub">Pass-and-play board game with a living market. Add to Home Screen for full-screen app mode.</div>
+        <div class="row" style="gap:12px">
+          <button class="btn primary" id="goNew">New Game</button>
+          <button class="btn" id="goResume">Resume</button>
+          <button class="btn ghost" id="goSettings">Settings</button>
+        </div>
+        <div class="hint">Tip: Safari → Share → <strong>Add to Home Screen</strong> for the app experience.</div>
       </div>
-      <div class="row" style="gap:6px;margin-top:8px">
-        <input id="playerNames" placeholder="Players (comma)" style="flex:1" />
-        <select id="scenario">
-          <option value="bangkok">Bangkok</option>
-          <option value="nyc">New York</option>
-          <option value="tokyo">Tokyo</option>
+    </div>
+  </section>
+
+  <!-- ---------- SETUP WIZARD ---------- -->
+  <section id="setup" class="screen">
+    <div class="container wizard">
+      <div class="panel">
+        <div class="row spread">
+          <h2 class="h2 stepTitle">1. City Pack</h2>
+          <span class="tag" id="macroPreview">—</span>
+        </div>
+        <select id="scenario" class="input">
+          <option value="bangkok">Bangkok — Urban Luxe</option>
+          <option value="nyc">New York — Capital Crunch</option>
+          <option value="tokyo">Tokyo — Precision Growth</option>
         </select>
-        <button class="btn" id="newBtn">New</button>
-        <button class="btn" id="saveBtn">Save</button>
-        <button class="btn" id="loadBtn">Load</button>
-      </div>
-      <div class="mini">Pass-and-play on iPad. Prices float with the macro. Buy real estate, trade stocks, take loans, or hit the casino. Don’t go broke.</div>
-    </div>
 
-    <div class="card" id="dashboard">
-      <div class="row"><div id="turnName"><strong>—</strong></div><div id="turnMoney">$—</div></div>
-      <div class="row">
-        <button class="btn primary" id="rollBtn">🎲 Roll</button>
-        <button class="btn" id="endBtn">End</button>
-        <button class="btn" id="passBtn">Pass iPad</button>
-      </div>
-      <div class="row" style="margin-top:8px">
-        <button class="btn good" id="buyBtn">Buy / Mortgage</button>
-        <button class="btn" id="portfolioBtn">Portfolio</button>
-        <button class="btn" id="bankBtn">Bank</button>
-        <button class="btn warn" id="casinoBtn">Casino</button>
-      </div>
-      <div class="mini" id="hint">Roll to start. Doubles = extra roll. Three doubles in a row = detention (Jail).</div>
-    </div>
+        <h2 class="h2 stepTitle" style="margin-top:12px">2. Players</h2>
+        <div class="row" style="gap:8px">
+          <input id="playerName" class="input" placeholder="Add player name" />
+          <select id="playerColor" class="input" style="max-width:140px">
+            <option value="t0">Gold</option><option value="t1">Ice</option><option value="t2">Rose</option>
+            <option value="t3">Mint</option><option value="t4">Coral</option><option value="t5">Lavender</option>
+          </select>
+          <select id="playerEmoji" class="input" style="max-width:100px">
+            <option>🚗</option><option>🐱</option><option>🛩️</option><option>🚀</option><option>🦊</option><option>🎩</option>
+          </select>
+          <button class="btn" id="addPlayer">Add</button>
+        </div>
+        <div id="playerList" class="list" style="margin-top:8px"></div>
 
-    <div class="card" id="players"></div>
+        <h2 class="h2 stepTitle" style="margin-top:12px">3. Rules</h2>
+        <div class="list">
+          <label class="item"><span>Fast Play (quicker bankruptcy)</span><input id="optFast" type="checkbox"></label>
+          <label class="item"><span>Enable Casino</span><input id="optCasino" type="checkbox" checked></label>
+          <label class="item"><span>Enable Stocks</span><input id="optStocks" type="checkbox" checked></label>
+          <label class="item"><span>Thai Language Labels (β)</span><input id="optThai" type="checkbox"></label>
+        </div>
+      </div>
 
-    <div class="card">
-      <div class="row"><strong>News & Events</strong><span class="tag" id="dayTag">Day 1</span></div>
-      <div id="log" class="log"></div>
+      <div class="panel">
+        <h2 class="h2">Preview</h2>
+        <div id="preview" class="item">
+          <div>
+            <div class="tag">Players</div>
+            <div id="previewPlayers">—</div>
+          </div>
+          <div style="text-align:right">
+            <div class="tag">Starting Cash</div>
+            <div id="previewCash">$2,500</div>
+          </div>
+        </div>
+        <div class="row" style="margin-top:8px;gap:8px">
+          <button class="btn" id="backHome">Back</button>
+          <button class="btn primary" id="startGame">Start Game</button>
+        </div>
+        <div class="hint">Everything can be changed later in Settings (gear icon in-game).</div>
+      </div>
     </div>
-  </aside>
+  </section>
+
+  <!-- ---------- GAME ---------- -->
+  <section id="game" class="screen">
+    <div class="container play">
+      <div class="panel boardWrap">
+        <div id="board" class="board"></div>
+      </div>
+
+      <aside class="sidebar">
+        <div class="card">
+          <div class="row spread">
+            <div id="turnTitle"><strong>Turn: —</strong></div>
+            <div class="tag" id="macroTag">Inflation 2.0% • Rate 3.5%</div>
+          </div>
+          <div class="row" style="margin-top:8px;gap:8px">
+            <button class="btn primary" id="rollBtn">🎲 Roll</button>
+            <button class="btn" id="endBtn">End</button>
+            <button class="btn" id="passBtn">Pass</button>
+            <button class="btn" id="gearBtn">⚙️</button>
+          </div>
+          <div class="hint" id="hint">Roll to start. Doubles give an extra turn.</div>
+        </div>
+
+        <div class="card">
+          <div class="row spread">
+            <strong>Player Panels</strong>
+            <span class="tag" id="dayTag">Day 1</span>
+          </div>
+          <div id="players"></div>
+        </div>
+
+        <div class="card">
+          <div class="row spread">
+            <strong>Actions</strong>
+            <span class="tag" id="cashNow">$—</span>
+          </div>
+          <div class="actions" style="margin-top:8px">
+            <button class="btn good" id="buyBtn">Buy / Manage</button>
+            <button class="btn" id="portfolioBtn">Portfolio</button>
+            <button class="btn" id="bankBtn">Bank</button>
+            <button class="btn warn" id="casinoBtn">Casino</button>
+            <button class="btn" id="stocksBtn">Stocks</button>
+            <button class="btn ghost" id="helpBtn">Help</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="row spread"><strong>News</strong><span class="tag" id="status">—</span></div>
+          <pre id="log" class="log"></pre>
+        </div>
+      </aside>
+    </div>
+  </section>
 </div>
 
-<!-- Modal -->
+<!-- Modal + Pass Overlay -->
 <div id="modal" class="modal"><div class="sheet" id="modalContent"></div></div>
-<!-- Pass overlay -->
 <div id="pass" class="pass"><div>
   <h2 id="passTitle">Pass iPad to Next Player</h2>
-  <p class="tag">Hide your portfolio. Tap continue when ready.</p>
+  <p class="tag">When ready, tap continue.</p>
   <button class="btn primary" id="passGo">Continue</button>
 </div></div>
 
 <script>
-/* =========================================================
-   CITY LEDGER — A Real-Scale Monopoly Remix (pass & play)
-   - Live macro: inflation, rates, shocks
-   - Real estate with mortgages and floating rents
-   - Stock market (sectors, daily drift + news shocks)
-   - Bank: loans, deposits, interest
-   - Casino: tiny risk toys (coin/roulette) for spice
-   - Venture: long-shot 10x (rare) or 0 (often)
-   ========================================================= */
-
-/* ----------------- Embedded JSON (expand freely) ----------------- */
+/* ==== DATA PACKS (names, building details added) ==== */
 const DATA = {
-  // Base price unit is "game dollars". Treat as 1 game $ ~= 1 USD for intuition.
-  scenarios: {
-    bangkok: {
-      name: "Bangkok",
-      macro: { inflation: 0.02, rate: 0.035 }, // starting values
-      properties: [
-        // name, set, basePrice, baseRent
-        ["Khlong Toei Condo", "lb", 220, 18],
-        ["On Nut Townhome", "lb", 260, 20],
-        ["Ekkamai Retail", "pk", 320, 26],
-        ["Thonglor Loft", "pk", 360, 30],
-        ["Sathorn Office", "or", 420, 34],
-        ["Silom Shop-House", "or", 460, 38],
-        ["Rama 9 Condo", "rd", 520, 44],
-        ["Asok Tower", "rd", 560, 48],
-        ["Ratchada Retail", "yl", 620, 56],
-        ["Phrom Phong Penthouse", "yl", 680, 62],
-        ["Chidlom Luxury", "gr", 740, 70],
-        ["Ploenchit Office", "gr", 820, 78],
-        ["Wireless Road HQ", "bl", 980, 95],
-        ["IconSiam Prime", "bl", 1200, 115]
-      ],
-      stocks: [
-        // ticker, name, sector, price, vol (0..1), beta (sens to news)
-        ["CPN", "Central Retail", "Consumer", 70, 0.3, 1.0],
-        ["PTT", "PTT Energy", "Energy", 45, 0.25, 1.2],
-        ["KBANK", "Kasikorn", "Financials", 90, 0.28, 1.1],
-        ["ADV", "AIS", "Telecom", 60, 0.18, 0.8],
-        ["BTS", "Bangkok Transit", "Transport", 25, 0.22, 1.0],
-      ],
-    },
-    nyc: {
-      name: "New York",
-      macro: { inflation: 0.025, rate: 0.04 },
-      properties: [
-        ["Queens Walk-up","lb",300,22],["Brooklyn Loft","pk",420,34],["LIC High-Rise","or",520,44],
-        ["Midtown Retail","rd",680,58],["SoHo Boutique","yl",760,66],["Chelsea Office","gr",880,78],
-        ["Upper East Penthouse","bl",1200,115],["Hudson Yards Tower","bl",1500,145]
-      ],
-      stocks: [
-        ["AAPL","Apple","Tech",190,0.22,1.0],["TSLA","Tesla","AutoTech",240,0.35,1.5],
-        ["JPM","JPMorgan","Financials",160,0.18,0.9],["XOM","Exxon","Energy",110,0.25,1.2],
-        ["DIS","Disney","Media",100,0.24,1.1]
+  scenarios:{
+    bangkok:{
+      name:"Bangkok",
+      macro:{inflation:0.02, rate:0.035},
+      buildings:[
+        ["Khlong Toei Condo","lb",220,18,"High-rise near Rama IV"],
+        ["On Nut Townhome","lb",260,20,"Low-rise cluster near BTS On Nut"],
+        ["Ekkamai Retail","pk",320,26,"Streetfront units near Soi 63"],
+        ["Thonglor Loft","pk",360,30,"Duplex lofts, pet-friendly"],
+        ["Sathorn Office","or",420,34,"Grade-A mid-rise"],
+        ["Silom Shop-House","or",460,38,"4-storey mixed-use"],
+        ["Rama 9 Condo","rd",520,44,"New CBD skyline view"],
+        ["Asok Tower","rd",560,48,"Corporate suites"],
+        ["Ratchada Retail","yl",620,56,"Night market belt"],
+        ["Phrom Phong Penthouse","yl",680,62,"Luxury duplex 48F"],
+        ["Chidlom Luxury","gr",740,70,"Designer residence"],
+        ["Ploenchit Office","gr",820,78,"Embassy row address"],
+        ["Wireless Road HQ","bl",980,95,"Flagship HQ"],
+        ["IconSiam Prime","bl",1200,115,"Riverfront landmark"]
       ]
     },
-    tokyo: {
-      name: "Tokyo",
-      macro: { inflation: 0.015, rate: 0.02 },
-      properties: [
-        ["Suginami Apt","lb",260,20],["Meguro Condo","pk",360,30],["Shinjuku Retail","or",480,40],
-        ["Shibuya Office","rd",620,56],["Ginza Boutique","yl",760,66],["Roppongi Tower","gr",900,80],
-        ["Marunouchi HQ","bl",1300,120]
-      ],
-      stocks: [
-        ["TOY","Toyota","Auto",180,0.2,0.9],["SONY","Sony","Electronics",145,0.22,1.0],
-        ["NTT","NTT","Telecom",95,0.15,0.7],["MUFG","MUFG","Financials",85,0.18,0.8],
-        ["FAST","Fast Retail","Consumer",100,0.2,1.0]
+    nyc:{
+      name:"New York",
+      macro:{inflation:0.025, rate:0.04},
+      buildings:[
+        ["Queens Walk-up","lb",300,22,"Pre-war near 7 train"],
+        ["Brooklyn Loft","pk",420,34,"Converted warehouse"],
+        ["LIC High-Rise","or",520,44,"Waterfront rental"],
+        ["Midtown Retail","rd",680,58,"Avenue frontage"],
+        ["SoHo Boutique","yl",760,66,"Cast-iron block"],
+        ["Chelsea Office","gr",880,78,"Creative suites"],
+        ["Upper East Penthouse","bl",1200,115,"Park views"],
+        ["Hudson Yards Tower","bl",1500,145,"New landmark"]
+      ]
+    },
+    tokyo:{
+      name:"Tokyo",
+      macro:{inflation:0.015, rate:0.02},
+      buildings:[
+        ["Suginami Apt","lb",260,20,"Family block"],
+        ["Meguro Condo","pk",360,30,"Station adjacent"],
+        ["Shinjuku Retail","or",480,40,"Alley retail"],
+        ["Shibuya Office","rd",620,56,"Tech suites"],
+        ["Ginza Boutique","yl",760,66,"Flagship lane"],
+        ["Roppongi Tower","gr",900,80,"Mixed-use tower"],
+        ["Marunouchi HQ","bl",1300,120,"Financial core"]
       ]
     }
-  },
-  // Chance-like and Chest-like cards (macro + personal finance)
-  cards: {
-    chance: [
-      ["Macro Shock: Energy spike","macro","inflation",+0.01],
-      ["Tech Boom: multiples expand","stockSector","Tech","+3%"],
-      ["Rent Holiday: city incentive","rentAll","-25%","2 turns"],
-      ["Bull Stampede: index rally","stockAll","+2%"]
-    ],
-    chest: [
-      ["Salary Bonus","cash","+150"],
-      ["Medical Bill","cash","-120"],
-      ["Tax Refund","cash","+100"],
-      ["Audit! Pay back taxes","cash","-200"]
-    ]
   }
 };
 
-/* ----------------- Game State ----------------- */
-const $ = s=>document.querySelector(s), $$ = s=>Array.from(document.querySelectorAll(s));
-const COLORS = ["t0","t1","t2","t3","t4","t5"];
+/* ==== SIMPLE STORE & NAV ==== */
+const $ = s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
+function show(id){ $$(".screen").forEach(x=>x.classList.remove("active")); $(id).classList.add("active"); }
+
+const COLORS=["t0","t1","t2","t3","t4","t5"];
 const state = {
-  scenarioKey: "bangkok",
-  tiles: [],         // 0..39 perimeter
-  players: [],
-  turn: 0,
-  dice: [0,0],
-  doublesInRow: 0,
-  day: 1,
-  macro: { inflation: 0.02, rate: 0.035 },
-  stocks: [],        // [{tkr, name, px, sector, vol, beta, posByPlayer: {idx:qty}}]
-  deck: { chance: [], chest: [] },
-  log: [],
-  phase: "await-roll" // await-roll | post-roll | buy-offer
+  screen:"home",
+  scenario:"bangkok",
+  macro:{inflation:0.02, rate:0.035},
+  tiles:[],
+  players:[],
+  turn:0,
+  day:1,
+  dice:[0,0],
+  doubles:0,
+  log:[],
+  options:{fast:false, casino:true, stocks:true, thai:false},
+  phase:"await-roll"
 };
 
-/* ----------------- Helpers ----------------- */
+function money(n){ return "$"+Number(Math.round(n)).toLocaleString(); }
 function log(x){ state.log.unshift(x); renderLog(); }
-function rand(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
-function rfloat(min,max){ return Math.random()*(max-min)+min; }
-function money(n){ return "$"+Number(n.toFixed(0)).toLocaleString(); }
-function idxToGrid(i){ const p=i%40;
-  if(p<=10) return {r:11, c:11-p};
-  if(p<=20) return {r:11-(p-10), c:1};
-  if(p<=30) return {r:1, c:(p-20)};
-  return {r:(p-30), c:11};
+function hint(t){ $("#hint").textContent=t; }
+function setStatus(t){ $("#status").textContent=t; $("#statusTop").textContent=t; }
+
+/* ==== HOME NAV ==== */
+$("#goNew").onclick=()=>{ show("#setup"); renderWizardPreview(); };
+$("#goResume").onclick=()=>{ load(); show("#game"); renderAll(); };
+$("#goSettings").onclick=()=>{ show("#setup"); };
+$("#backHome").onclick=()=>{ show("#home"); };
+
+/* ==== WIZARD ==== */
+const wizardPlayers=[];
+function renderWizardPreview(){
+  const sc = DATA.scenarios[$("#scenario").value];
+  $("#macroPreview").textContent = `${sc.name}: Infl ${pct(sc.macro.inflation)} • Rate ${pct(sc.macro.rate)}`;
+  $("#previewPlayers").textContent = wizardPlayers.length ? wizardPlayers.map(p=>`${p.emoji} ${p.name}`).join(", ") : "—";
+  $("#previewCash").textContent = money(2500);
+}
+$("#scenario").onchange=renderWizardPreview;
+$("#optFast").onchange=e=>state.options.fast=e.target.checked;
+$("#optCasino").onchange=e=>state.options.casino=e.target.checked;
+$("#optStocks").onchange=e=>state.options.stocks=e.target.checked;
+$("#optThai").onchange=e=>state.options.thai=e.target.checked;
+
+$("#addPlayer").onclick=()=>{
+  const name=$("#playerName").value.trim()||`Player ${wizardPlayers.length+1}`;
+  const color=$("#playerColor").value;
+  const emoji=$("#playerEmoji").value;
+  if(wizardPlayers.length>=6){ setStatus("Max 6 players"); return; }
+  wizardPlayers.push({name,color,emoji});
+  const row=document.createElement("div"); row.className="item";
+  row.innerHTML=`<div>${emoji} <strong>${name}</strong><div class="tag">${color.toUpperCase()}</div></div>
+  <button class="btn warn">Remove</button>`;
+  row.querySelector("button").onclick=()=>{ wizardPlayers.splice(Array.from(row.parentNode.children).indexOf(row),1); row.remove(); renderWizardPreview(); };
+  $("#playerList").appendChild(row);
+  $("#playerName").value="";
+  renderWizardPreview();
+};
+
+$("#startGame").onclick=()=>{
+  const scKey=$("#scenario").value;
+  if(wizardPlayers.length<2){ setStatus("Add at least 2 players"); return; }
+  bootstrapGame(scKey, wizardPlayers);
+  wizardPlayers.length=0; $("#playerList").innerHTML="";
+  show("#game"); renderAll(); persist();
+};
+
+/* ==== GAME INIT ==== */
+function bootstrapGame(scKey, players){
+  state.scenario=scKey;
+  const sc=DATA.scenarios[scKey];
+  state.macro={...sc.macro};
+  state.day=1; state.turn=0; state.doubles=0; state.log=[];
+  state.players = players.map(p=>({name:p.name, color:p.color, emoji:p.emoji, cash:2500, pos:0, inJail:false, jailTries:0, loans:[], deposits:0}));
+  buildTiles(sc);
+  log(`New game: ${sc.name}. Inflation ${pct(state.macro.inflation)}, Rate ${pct(state.macro.rate)}.`);
+  setStatus("Game started");
 }
 
-/* ----------------- Board & Economy Setup ----------------- */
-function initScenario(key){
-  state.scenarioKey = key;
-  const sc = DATA.scenarios[key];
-  state.macro = {...sc.macro};
-  // Build tiles: GO, properties spread with utilities, bank, casino, stocks, chance, chest, tax, jail, free, goto jail
-  state.tiles = [];
-  const add = (i,type,name,opts={})=> state.tiles.push({i,type,name,owner:null, ...opts});
+function buildTiles(sc){
+  state.tiles=[];
+  const add=(i,type,name,opts={})=>state.tiles.push({i,type,name, ...opts, owner:null, mortgaged:false});
   add(0,"go","GO",{pay:200});
-  const props = sc.properties.slice();
-  let i=1, p=0;
-  const injects = {
-    5: ["bank","City Bank",{kind:"bank"}],
-    7: ["chance","Market Chance",{}],
-    10:["jail","Detention",{}],
-    12:["stock","Stock Exchange",{}],
-    15:["chest","Life Event",{}],
-    18:["casino","Casino",{}],
-    20:["free","Free Parking",{}],
-    22:["tax","Property Tax",{pay:200}],
-    25:["chance","Market Chance",{}],
-    28:["stock","Stock Exchange",{}],
-    30:["gotojail","Go To Detention",{}],
-    35:["chest","Life Event",{}],
-    38:["tax","Luxury Tax",{pay:150}],
-  };
+  const injects={5:["bank","City Bank",{}],7:["chance","Market Chance",{}],10:["jail","Detention",{}],12:["stock","Stock Exchange",{}],15:["chest","Life Event",{}],18:["casino","Casino",{}],20:["free","Free Parking",{}],22:["tax","Property Tax",{pay:200}],25:["chance","Market Chance",{}],28:["stock","Stock Exchange",{}],30:["goto","Go To Detention",{}],35:["chest","Life Event",{}],38:["tax","Luxury Tax",{pay:150}]};
+  let i=1,p=0;
   while(i<40){
-    if(injects[i]){ const [t,name,opts]=injects[i]; add(i,t,name,opts); i++; continue; }
-    if(p<props.length){
-      const [name,set,basePrice,baseRent] = props[p++];
-      add(i,"prop",name,{set, basePrice, baseRent, mortgaged:false});
+    if(injects[i]){ const [t,n,o]=injects[i]; add(i,t,n,o); i++; continue; }
+    if(p<sc.buildings.length){
+      const [n,set,price,rent,desc]=sc.buildings[p++]; add(i,"prop",n,{set, basePrice:price, baseRent:rent, desc});
       i++; continue;
     }
-    add(i,"prop","Local Block",{set:"lb",basePrice:220,baseRent:18}); i++;
+    add(i,"prop","Local Block",{set:"lb",basePrice:220,baseRent:18,desc:"Generic mixed-use"}); i++;
   }
-  // Stocks from scenario
-  state.stocks = DATA.scenarios[key].stocks.map(([tkr,name,sector,px,vol,beta])=>({
-    tkr,name,sector,px,vol,beta,pos:{}
-  }));
-  // Cards
-  state.deck = {
-    chance: DATA.cards.chance.map(x=>({t:x[0],k:x[1],a:x[2],b:x[3]})),
-    chest:  DATA.cards.chest.map(x=>({t:x[0],k:x[1],a:x[2],b:x[3]}))
-  };
 }
 
-function newGame(names,key){
-  initScenario(key);
-  state.players = names.slice(0,6).map(n=>({name:n.trim(), cash: 2500, pos:0, inJail:false, jailTries:0, creditScore:700, loans:[], deposits:0}));
-  state.turn=0; state.phase="await-roll"; state.doublesInRow=0; state.day=1; state.log=[];
-  renderBoard(); renderPlayers(); renderTop(); hint("Roll to start. Markets tick each turn.");
-  log(`New game in ${DATA.scenarios[key].name}. Inflation ${pct(state.macro.inflation)}, policy rate ${pct(state.macro.rate)}.`);
-}
-
-function pct(v){ return (v*100).toFixed(1)+"%"; }
-
-/* ----------------- Rendering ----------------- */
+/* ==== BOARD RENDER ==== */
+function idxToGrid(i){const p=i%40;if(p<=10)return{r:11,c:11-p};if(p<=20)return{r:11-(p-10),c:1};if(p<=30)return{r:1,c:(p-20)};return{r:(p-30),c:11};}
+function adjPrice(t){const loc={lb:1,pk:1.15,or:1.25,rd:1.35,yl:1.45,gr:1.6,bl:1.9}[t.set]||1; const inf=Math.pow(1+state.macro.inflation,(state.day-1)/7); return Math.round(t.basePrice*loc*inf);}
+function currentRent(t){let base=Math.max(t.baseRent,Math.round(adjPrice(t)*0.07/10)); if(t.mortgaged) base=0; return base;}
 function renderBoard(){
-  const el = $("#board"); el.innerHTML = "";
+  const el=$("#board"); el.innerHTML="";
   for(let i=0;i<40;i++){
-    const pos = idxToGrid(i);
-    const t = state.tiles[i];
-    const d = document.createElement("div");
-    d.className="tile"; d.style.gridRow=pos.r; d.style.gridColumn=pos.c;
+    const pos=idxToGrid(i); const t=state.tiles[i];
+    const d=document.createElement("div"); d.className="tile"; d.style.gridRow=pos.r; d.style.gridColumn=pos.c;
     let bar="", price="", owner="";
-    if(t.type==="prop"){
-      bar = `<div class="bar ${t.set}"></div>`;
-      const priceNow = adjPrice(t);
-      price = `<div class="price">${money(priceNow)}</div>`;
-      if(t.owner!=null) owner = `<div class="owner ${COLORS[t.owner]}"></div>`;
-    }
-    d.innerHTML = `${bar}<div>${t.name}</div>${price}${owner}`;
-    d.addEventListener("click",()=>inspectTile(i));
+    if(t.type==="prop"){ bar=`<div class="bar ${t.set}"></div>`; price=`<div class="price">${money(adjPrice(t))}</div>`; if(t.owner!=null) owner=`<div class="owner ${state.players[t.owner].color}"></div>`; }
+    d.innerHTML=`${bar}<div>${t.name}</div>${price}${owner}`;
+    d.onclick=()=>inspectTile(i);
     el.appendChild(d);
   }
-  // center
-  const c = document.createElement("div"); c.className="center";
-  c.innerHTML = `<div style="text-align:center">
-    <h1>CITY LEDGER</h1>
-    <div class="tag">${DATA.scenarios[state.scenarioKey].name} • Live Macro • Stocks • Casino • Bank</div>
-  </div>`;
-  el.appendChild(c);
+  const c=document.createElement("div"); c.className="center"; c.innerHTML=`<div style="text-align:center"><div class="h1">CITY LEDGER</div><div class="tag">${DATA.scenarios[state.scenario].name} • Live Macro</div></div>`; el.appendChild(c);
   renderTokens();
 }
 function renderTokens(){
   $$(".token").forEach(n=>n.remove());
   const board=$("#board");
-  state.players.forEach((p,idx)=>{
-    const pos=idxToGrid(p.pos); const t=document.createElement("div");
-    t.className=`token ${COLORS[idx]}`;
-    const off=8*idx;
-    t.style.top = `calc(((100% - 16px)/11) * ${pos.r-0.5} + ${idx?'-':''}${off}px)`;
-    t.style.left= `calc(((100% - 16px)/11) * ${pos.c-0.5} + ${idx?'':'+'}${off}px)`;
+  state.players.forEach((p,i)=>{
+    const pos=idxToGrid(p.pos);
+    const t=document.createElement("div");
+    t.className=`token ${p.color}`;
+    const off=8*i;
+    t.style.top=`calc(((100% - 16px)/11) * ${pos.r-0.5} - ${off}px)`;
+    t.style.left=`calc(((100% - 16px)/11) * ${pos.c-0.5} + ${off}px)`;
     board.appendChild(t);
   });
 }
-function renderPlayers(){
+
+/* ==== SIDE + LOG ==== */
+function renderPanels(){
+  $("#turnTitle").innerHTML=`<strong>Turn: ${state.players[state.turn]?.emoji||""} ${state.players[state.turn]?.name||"—"}</strong>`;
+  $("#macroTag").textContent=`Inflation ${pct(state.macro.inflation)} • Rate ${pct(state.macro.rate)}`;
+  $("#dayTag").textContent=`Day ${state.day}`;
+  $("#cashNow").textContent=money(current().cash);
   const wrap=$("#players"); wrap.innerHTML="";
   state.players.forEach((p,i)=>{
-    const loans = p.loans.reduce((s,l)=>s+l.principal,0);
-    const card = document.createElement("div"); card.className="row"; card.style.margin="6px 0";
-    card.innerHTML = `<div>• <span class="owner ${COLORS[i]}" style="position:static"></span> ${p.name}${i===state.turn?' <strong>(active)</strong>':''}
-      <div class="tag">Pos ${p.pos}${p.inJail?' — Detained':''} • Credit ${p.creditScore}</div>
-      <div class="tag">Props: ${ownedList(i)||'—'}</div></div>
-      <div style="text-align:right">
-        <div>${money(p.cash)}</div>
-        <div class="tag">Loans ${money(loans)} • Dep ${money(p.deposits)}</div>
-      </div>`;
-    const box=document.createElement("div"); box.className="card"; box.appendChild(card);
-    wrap.appendChild(box);
+    const div=document.createElement("div"); div.className="item";
+    div.innerHTML=`<div>${p.emoji} <strong>${p.name}</strong><div class="tag">Pos ${p.pos}${p.inJail?" • Detained":""}</div></div>
+    <div style="text-align:right"><div>${money(p.cash)}</div><div class="tag">${p.color.toUpperCase()}</div></div>`;
+    wrap.appendChild(div);
   });
-  $("#turnName").innerHTML = `<strong>Turn: ${state.players[state.turn]?.name||'—'}</strong>`;
-  $("#turnMoney").textContent = state.players[state.turn] ? money(state.players[state.turn].cash) : "$—";
 }
-function renderTop(){
-  $("#macroTag").textContent = `Inflation ${pct(state.macro.inflation)} • Rate ${pct(state.macro.rate)}`;
-  $("#dayTag").textContent = `Day ${state.day}`;
-}
-function renderLog(){
-  $("#log").innerHTML = state.log.map(x=>"• "+x).join("\n");
-}
-function hint(t){ $("#hint").textContent=t; }
-
-/* ----------------- Pricing & Rent ----------------- */
-function adjPrice(tile){
-  // nominal price increases with cumulative inflation & location quality
-  const loc = {lb:1.0, pk:1.15, or:1.25, rd:1.35, yl:1.45, gr:1.6, bl:1.9}[tile.set]||1.0;
-  const inf = Math.pow(1+state.macro.inflation, (state.day-1)/7); // weekly compounding from Day 1 baseline
-  return Math.round(tile.basePrice * loc * inf);
-}
-function currentRent(tile){
-  // rent floats ~ 7% of price baseline plus set bonus
-  const price = adjPrice(tile);
-  let base = Math.max(tile.baseRent, Math.round(price*0.07/10)); // scaled, but not crazy
-  const setCountTotal = state.tiles.filter(t=>t.type==="prop" && t.set===tile.set).length;
-  const owner = tile.owner;
-  const setOwnedByOwner = state.tiles.filter(t=>t.type==="prop" && t.set===tile.set && t.owner===owner).length;
-  if(owner!=null && setOwnedByOwner===setCountTotal) base = Math.round(base*1.6); // set bonus
-  if(tile.mortgaged) base = 0;
-  return base;
-}
-function ownedList(ownerIdx){
-  return state.tiles.filter(t=>t.type==="prop" && t.owner===ownerIdx)
-    .map(t=>t.name).join(", ");
-}
-
-/* ----------------- Turn Flow ----------------- */
+function renderLog(){ $("#log").textContent = state.log.map(x=>"• "+x).join("\n"); }
+function renderAll(){ renderBoard(); renderPanels(); }
+function pct(v){ return (v*100).toFixed(1)+"%"; }
 function current(){ return state.players[state.turn]; }
 
+/* ==== TURN FLOW ==== */
 function roll(){
   const p=current(); if(!p) return;
   if(p.inJail){
-    const a=rand(1,6), b=rand(1,6); state.dice=[a,b]; log(`${p.name} rolls ${a}+${b} in Detention`);
-    if(a===b){ p.inJail=false; p.jailTries=0; log("Doubles! Released."); move(a+b); postMove(true); }
-    else {
-      p.jailTries++;
-      if(p.jailTries>=3){ pay(p,50); p.inJail=false; p.jailTries=0; log("Paid $50 after 3 tries. Released."); move(a+b); postMove(false); }
-      else endTurn();
-    }
+    const a=r(1,6), b=r(1,6); state.dice=[a,b]; log(`${p.name} rolls ${a}+${b} in Detention.`);
+    if(a===b){ p.inJail=false;p.jailTries=0; move(a+b); postMove(true); }
+    else{ p.jailTries++; if(p.jailTries>=3){ pay(p,50,"Detention fine"); p.inJail=false;p.jailTries=0; move(a+b); postMove(false);} else endTurn(); }
     return;
   }
-  const a=rand(1,6), b=rand(1,6); state.dice=[a,b]; log(`${p.name} rolls ${a}+${b}`);
+  const a=r(1,6), b=r(1,6); state.dice=[a,b]; log(`${p.name} rolls ${a}+${b}.`);
   move(a+b);
-  if(a===b){
-    state.doublesInRow++;
-    if(state.doublesInRow===3){ log("Three doubles → Detention"); sendToJail(p); endTurn(true); return; }
-    postMove(true);
-  } else { state.doublesInRow=0; postMove(false); }
+  if(a===b){ state.doubles++; if(state.doubles===3){ sendToJail(p); endTurn(true); } else postMove(true); }
+  else { state.doubles=0; postMove(false); }
 }
-
 function move(steps){
   const p=current(); const old=p.pos; p.pos=(p.pos+steps)%40; renderTokens();
-  if(p.pos<old){ // passed GO
-    p.cash+=200; log(`${p.name} collects ${money(200)} for passing GO.`);
-    // savings interest tick & loan interest tick daily
-    applyDailyFinance(p);
-  }
+  if(p.pos<old){ p.cash+=200; log(`${p.name} collects ${money(200)} for passing GO.`); dailyFinance(p); }
   onLand();
 }
-
 function onLand(){
   const p=current(); const t=state.tiles[p.pos];
   if(!t) return;
+  setStatus(`${p.name} → ${t.name}`);
   switch(t.type){
     case "prop":
-      if(t.owner==null) { state.phase="buy-offer"; buyOffer(t); }
-      else if(t.owner!==state.turn) { payRent(p, state.players[t.owner], t); }
+      if(t.owner==null){ offerBuy(t); }
+      else if(t.owner!==state.turn){ const r=currentRent(t); pay(p,r,`Rent for ${t.name}`); state.players[t.owner].cash+=r; }
       break;
     case "bank": openBank(); break;
-    case "stock": openStocks(); break;
-    case "casino": openCasino(); break;
-    case "chance": drawCard("chance"); break;
-    case "chest":  drawCard("chest"); break;
-    case "tax": pay(p, t.pay||150, "Taxes paid."); break;
-    case "gotojail": sendToJail(p); break;
-    case "free":
-    case "jail":
-    case "go":
-    default: /* nothing */ break;
+    case "stock": if(state.options.stocks) openStocks(); break;
+    case "casino": if(state.options.casino) openCasino(); break;
+    case "chance": newsCard("Macro blip"); break;
+    case "chest": lifeCard("Unexpected bill"); break;
+    case "tax": pay(p,t.pay||150,"Taxes"); break;
+    case "goto": sendToJail(p); break;
   }
 }
-
-function postMove(doubles){
-  state.phase="post-roll";
-  hint(doubles ? "Doubles! You may roll again or end turn." : "Buy/Manage or End Turn.");
-  renderPlayers();
-}
+function postMove(double){ state.phase="post-roll"; hint(double?"Doubles! Roll again or end.":"Buy/Manage or End."); renderPanels(); }
 function endTurn(silent=false){
-  macroTick(); // markets move, events possibly trigger each turn end
-  state.turn = (state.turn+1) % state.players.length;
-  state.phase = "await-roll";
-  hint("Pass iPad, then Roll.");
-  renderPlayers(); renderTop();
-  if(!silent) openPass();
-  persist();
+  macroTick();
+  state.turn=(state.turn+1)%state.players.length;
+  state.phase="await-roll"; hint("Pass iPad, then Roll.");
+  renderPanels(); if(!silent) openPass(); persist();
 }
 
-/* ----------------- Money Ops ----------------- */
-function pay(p,amt,tag){ p.cash-=amt; if(tag) log(tag+` (${money(amt)})`); checkBankruptcy(p); renderPlayers(); }
-function gain(p,amt,tag){ p.cash+=amt; if(tag) log(tag+` (${money(amt)})`); renderPlayers(); }
-function checkBankruptcy(p){
-  if(p.cash>=0) return;
-  showModal(`<h3>${p.name} is insolvent</h3>
-    <p>Sell assets, mortgage properties, or declare bankruptcy.</p>`,
-    [
-      {label:"Auto-liquidate (sell 30% discount)", cb:()=>{
-        autoLiquidate(p); closeModal();
-      }},
-      {label:"Declare bankruptcy", class:"warn", cb:()=>{
-        liquidateToBank(p); eliminate(p); closeModal();
-      }},
-      {label:"Cancel", primary:true, cb:closeModal}
-    ]);
+/* ==== MONEY ==== */
+function r(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
+function pay(p,amt,tag){ p.cash-=amt; if(tag) log(`${tag} (${money(amt)})`); if(p.cash<0) insolvent(p); renderPanels(); }
+function insolvent(p){
+  showModal(`<h3>${p.name} is Insolvent</h3><p>Mortgage properties or declare bankruptcy.</p>`,
+  [{label:"Auto-mortgage",cb:()=>{autoMortgage(p); closeModal();}},
+   {label:"Bankruptcy",class:"warn",cb:()=>{bankrupt(p); closeModal();}},
+   {label:"Cancel",primary:true,cb:closeModal}]);
+}
+function autoMortgage(p){
+  const idx=state.players.indexOf(p);
+  const props=state.tiles.filter(t=>t.type==="prop"&&t.owner===idx&&!t.mortgaged).sort((a,b)=>adjPrice(b)-adjPrice(a));
+  for(const t of props){ t.mortgaged=true; p.cash+=Math.round(adjPrice(t)*0.5); log(`Mortgaged ${t.name}.`); if(p.cash>=0) break; }
+  renderAll();
+}
+function bankrupt(p){
+  const idx=state.players.indexOf(p);
+  state.tiles.forEach(t=>{ if(t.owner===idx){ t.owner=null; t.mortgaged=false; }});
+  state.players.splice(idx,1);
+  if(state.turn>=state.players.length) state.turn=0;
+  if(state.players.length===1){ showModal(`<h3>${state.players[0].name} Wins!</h3>`,[{label:"OK",primary:true,cb:closeModal}]); }
+  renderAll();
 }
 
-/* ----------------- Buy / Mortgage ----------------- */
-function buyOffer(tile){
-  const p=current(); const price = adjPrice(tile);
-  const mort = tile.mortgaged ? "<div class='tag'>Currently mortgaged</div>" : "";
-  showModal(`<h3>Acquire ${tile.name}?</h3>
-    <p>Price: ${money(price)} • Current Rent: ${money(currentRent(tile))}</p>${mort}`,
-    [
-      {label:"Buy", primary:true, cb:()=>{
-        if(p.cash>=price){ pay(p,price); tile.owner=state.turn; log(`${p.name} acquired ${tile.name}.`); renderBoard(); renderPlayers(); closeModal(); }
-        else {
-          closeModal();
-          showModal(`<h3>Not enough cash</h3><p>Open Bank for a loan?</p>`,
-          [{label:"Open Bank", primary:true, cb:()=>{closeModal(); openBank();}},{label:"Cancel", cb:closeModal}]);
-        }
-      }},
-      {label:"Mortgage (after purchase)", cb:()=>{ closeModal(); log("Buy first to mortgage."); }},
-      {label:"Skip", cb:()=>{ closeModal(); }}
-    ]);
+/* ==== BUY / MANAGE ==== */
+function offerBuy(t){
+  const p=current(); const price=adjPrice(t);
+  showModal(`<h3>Acquire ${t.name}?</h3><p>${t.desc||""}</p><p>Price ${money(price)} • Rent now ${money(currentRent(t))}</p>`,
+  [{label:"Buy",primary:true,cb:()=>{ if(p.cash>=price){ p.cash-=price; t.owner=state.turn; log(`${p.name} bought ${t.name}.`); closeModal(); renderAll(); } else { closeModal(); showModal(`<h3>Need funds</h3><p>Open Bank for a loan?</p>`,[{label:"Open Bank",primary:true,cb:()=>{closeModal();openBank();}},{label:"Cancel",cb:closeModal}]); }}},
+   {label:"Skip",cb:closeModal}]);
 }
-function mortgageTile(tile, p){
-  if(tile.owner!==state.turn || tile.mortgaged) return;
-  tile.mortgaged = true;
-  const val = Math.round(adjPrice(tile)*0.5);
-  gain(p, val, `Mortgaged ${tile.name}`);
-  renderBoard(); renderPlayers();
-}
-function unmortgageTile(tile, p){
-  if(tile.owner!==state.turn || !tile.mortgaged) return;
-  const val = Math.round(adjPrice(tile)*0.5*1.1);
-  if(p.cash>=val){ pay(p, val, `Unmortgaged ${tile.name}`); tile.mortgaged=false; renderBoard(); renderPlayers(); }
-  else log("Insufficient cash.");
-}
-
-/* ----------------- Rent ----------------- */
-function payRent(tenant, owner, tile){
-  const r = currentRent(tile);
-  pay(tenant, r, `Rent to ${owner.name} for ${tile.name}`);
-  gain(owner, r);
-}
-
-/* ----------------- Macro & Market ----------------- */
-function macroTick(){
-  // Small stochastic drift
-  const drift = rfloat(-0.002, 0.004);
-  state.macro.inflation = Math.max(0, state.macro.inflation + drift);
-  // Simple feedback: high inflation nudges rates up, and vice versa
-  state.macro.rate += (state.macro.inflation - 0.02) * 0.15;
-  state.macro.rate = Math.max(0, Math.min(0.12, state.macro.rate));
-  // Market tick
-  state.stocks.forEach(s=>{
-    const daily = rfloat(-s.vol, s.vol); // base volatility
-    // Macro beta (inflation up often harms growth)
-    const macroShock = - (state.macro.inflation-0.02) * s.beta * 50; // scale a bit
-    const pct = daily*0.01 + macroShock*0.0005;
-    s.px = Math.max(1, s.px * (1+pct));
-  });
-  // Random event ~ 20% chance
-  if(Math.random()<0.2) fireNews();
-  state.day++; renderTop();
-  // Everyone accrues deposit interest daily; loan interest accrues too
-  state.players.forEach(p=>applyDailyFinance(p, /*silent=*/true));
-}
-function fireNews(){
-  const roll = Math.random();
-  if(roll<0.33){
-    const c = pick(DATA.cards.chance);
-    log(`[News] ${c[0]}`);
-    applyCard({k:c[1],a:c[2],b:c[3]}, /*silent=*/true);
-  } else {
-    // Sector pop
-    const sectors = [...new Set(state.stocks.map(s=>s.sector))];
-    const sec = pick(sectors);
-    const dir = Math.random()<0.6 ? +1 : -1;
-    state.stocks.forEach(s=>{ if(s.sector===sec){ s.px = Math.max(1, s.px*(1+dir*0.03)); }});
-    log(`[Market] ${sec} sector ${dir>0?'rallies':'pulls back'} 3%.`);
-  }
-}
-function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
-
-/* ----------------- Cards ----------------- */
-function drawCard(kind){
-  const bucket = kind==="chance"? state.deck.chance : state.deck.chest;
-  const card = bucket[rand(0,bucket.length-1)];
-  showModal(`<h3>${kind==="chance"?'Market Chance':'Life Event'}</h3><p>${card.t}</p>`,[
-    {label:"Apply", primary:true, cb:()=>{ applyCard(card); closeModal(); }}
-  ]);
-}
-function applyCard(card, silent=false){
-  const p=current();
-  switch(card.k){
-    case "macro":
-      if(card.a==="inflation"){ state.macro.inflation = Math.max(0, state.macro.inflation + Number(card.b)); if(!silent) log(`Inflation shifts to ${pct(state.macro.inflation)}.`); }
-      break;
-    case "stockSector":
-      state.stocks.forEach(s=>{ if(s.sector===card.a){ s.px = Math.max(1, s.px*1.03); }});
-      if(!silent) log(`${card.a} sector gains ~3%.`);
-      break;
-    case "rentAll":
-      // implement as a two-day global discount flag
-      state.rentDiscount = {pct:-0.25, left:2};
-      if(!silent) log(`City rent relief active: -25% for 2 turns.`);
-      break;
-    case "stockAll":
-      state.stocks.forEach(s=>{ s.px = Math.max(1, s.px*1.02); });
-      if(!silent) log(`Broad market up ~2%.`);
-      break;
-    case "cash":
-      const amt = Number(String(card.a).replace("+","").replace("-",""));
-      if(String(card.a).startsWith("+")) gain(p,amt,card.t);
-      else pay(p,amt,card.t);
-      break;
-  }
-}
-
-/* ----------------- Finance (deposits & loans) ----------------- */
-function applyDailyFinance(p, silent){
-  // deposit interest (simple daily rate = annual/365)
-  const dep = p.deposits||0;
-  if(dep>0){
-    const inc = dep*(state.macro.rate/365);
-    p.deposits += inc;
-    if(!silent) log(`${p.name} earned deposit interest ${money(inc)}.`);
-  }
-  // loans accrue interest
-  p.loans.forEach(l=>{
-    l.principal += l.principal*(l.rate/365);
-  });
-  renderPlayers();
-}
-function openBank(){
-  const p=current();
-  const loans = p.loans.map((l,i)=>`<div class="row"><div>Loan #${i+1} @ ${pct(l.rate)}<div class="tag">Principal ${money(l.principal)}</div></div>
-      <button class="btn warn" data-act="repay" data-i="${i}">Repay ${money(Math.min(p.cash,l.principal))}</button></div>`).join("") || "<div class='tag'>No loans</div>";
-  showModal(`<h3>City Bank</h3>
-    <p>Policy rate ${pct(state.macro.rate)} • Your credit ${p.creditScore}</p>
-    <div class="row"><input id="loanAmt" placeholder="Loan amount" style="flex:1" /><button class="btn" id="takeLoan">Take Loan</button></div>
-    <div class="row"><input id="depAmt" placeholder="Deposit amount" style="flex:1" /><button class="btn" id="doDep">Deposit</button></div>
-    <div class="row"><input id="withAmt" placeholder="Withdraw amount" style="flex:1" /><button class="btn" id="doWith">Withdraw</button></div>
-    <h4>Loans</h4>${loans}
-  `,[{label:"Close",primary:true,cb:closeModal}]);
-  $("#takeLoan").onclick=()=>{
-    const amt=Number($("#loanAmt").value||0);
-    if(amt>0){
-      const rate = Math.max(state.macro.rate+0.03, 0.05) - (p.creditScore-700)*0.00005;
-      p.loans.push({principal:amt, rate:Math.max(0.03, rate)});
-      gain(p,amt,"Loan disbursed");
-      p.creditScore = Math.max(500, p.creditScore-10);
-      renderPlayers(); persist();
-    }
-  };
-  $("#doDep").onclick=()=>{
-    const amt=Number($("#depAmt").value||0);
-    if(amt>0 && p.cash>=amt){ p.cash-=amt; p.deposits+=amt; log(`Deposited ${money(amt)}.`); renderPlayers(); persist(); }
-  };
-  $("#doWith").onclick=()=>{
-    const amt=Number($("#withAmt").value||0);
-    if(amt>0 && p.deposits>=amt){ p.deposits-=amt; p.cash+=amt; log(`Withdrew ${money(amt)}.`); renderPlayers(); persist(); }
-  };
-  $("#modalContent").addEventListener("click",(e)=>{
-    const b=e.target.closest("button[data-act='repay']"); if(!b) return;
-    const i=+b.getAttribute("data-i"); const L=p.loans[i];
-    const payAmt=Math.min(p.cash, L.principal);
-    if(payAmt>0){ p.cash-=payAmt; L.principal-=payAmt; log(`Repaid ${money(payAmt)}.`); if(L.principal<=1){ p.loans.splice(i,1); log("Loan closed."); p.creditScore=Math.min(850,p.creditScore+5); } renderPlayers(); persist(); openBank(); }
-  }, {once:true});
-}
-
-/* ----------------- Stocks ----------------- */
-function openStocks(){
-  const p=current();
-  const rows = state.stocks.map(s=>{
-    const qty = s.pos[state.turn]||0;
-    return `<div class="row" style="gap:6px">
-      <div><strong>${s.tkr}</strong> ${s.name}<div class="tag">${s.sector}</div></div>
-      <div style="text-align:right">
-        <div>${money(s.px)}</div>
-        <div class="tag">You: ${qty} sh</div>
-      </div>
-      <div>
-        <button class="btn" data-t="${s.tkr}" data-act="buy">Buy</button>
-        <button class="btn warn" data-t="${s.tkr}" data-act="sell">Sell</button>
-      </div>
-    </div>`;
-  }).join("");
-  showModal(`<h3>Stock Exchange</h3>
-    <p>Prices move each turn. Beware volatility.</p>
-    <div class="row"><input id="qty" placeholder="Qty" style="flex:1" /></div>
-    ${rows}
-  `,[{label:"Close",primary:true,cb:closeModal}]);
-  $("#modalContent").addEventListener("click",(e)=>{
-    const b=e.target.closest("button[data-act]"); if(!b) return;
-    const t=b.getAttribute("data-t"); const act=b.getAttribute("data-act"); const q=Number($("#qty").value||0);
-    const s = state.stocks.find(x=>x.tkr===t); if(!s || q<=0) return;
-    if(act==="buy"){
-      const cost=s.px*q; if(p.cash>=cost){ pay(p,cost,`Bought ${q} ${t}`); s.pos[state.turn]=(s.pos[state.turn]||0)+q; }
-      else log("Insufficient cash.");
-    } else {
-      const have=s.pos[state.turn]||0; if(have>=q){ s.pos[state.turn]=have-q; gain(p, s.px*q, `Sold ${q} ${t}`); }
-      else log("Not enough shares.");
-    }
-    persist(); openStocks();
-  }, {once:true});
-}
-
-/* ----------------- Casino (light) ----------------- */
-function openCasino(){
-  const p=current();
-  showModal(`<h3>Casino</h3>
-    <p>House edge is real. Fun tax for the optimistic.</p>
-    <div class="row"><input id="bet" placeholder="Bet amount" style="flex:1" /></div>
-    <div class="row">
-      <button class="btn" id="coin">Coin Flip (2x, 49%)</button>
-      <button class="btn" id="roul">Roulette Red (2x, 47.4%)</button>
-      <button class="btn" id="venture">Venture Ticket (10x, 8%)</button>
-    </div>
-  `,[{label:"Close",primary:true,cb:closeModal}]);
-  const betVal=()=>Number($("#bet").value||0);
-  $("#coin").onclick=()=>{ const b=betVal(); if(b>0&&p.cash>=b){ if(Math.random()<0.49){ gain(p,b, "Coin WIN"); } else { pay(p,b,"Coin LOSE"); } persist(); }};
-  $("#roul").onclick=()=>{ const b=betVal(); if(b>0&&p.cash>=b){ if(Math.random()<0.474){ gain(p,b,"Roulette WIN"); } else { pay(p,b,"Roulette LOSE"); } persist(); }};
-  $("#venture").onclick=()=>{ const b=betVal(); if(b>0&&p.cash>=b){ if(Math.random()<0.08){ gain(p,b*9,"Venture 10x hit!"); } else { pay(p,b,"Venture bust"); } persist(); }};
-}
-
-/* ----------------- Portfolio Overview ----------------- */
 function openPortfolio(){
   const i=state.turn, p=current();
-  const props = state.tiles.filter(t=>t.type==="prop" && t.owner===i);
-  const propRows = props.map(t=>`<div class="row">
-    <div>${t.name}<div class="tag">Rent ${money(currentRent(t))}${t.mortgaged?' • Mortgaged':''}</div></div>
-    <div>
-      <button class="btn" data-act="mort" data-name="${t.name}">Mortgage</button>
-      <button class="btn" data-act="unmort" data-name="${t.name}">Unmortgage</button>
-    </div>
-  </div>`).join("") || "<div class='tag'>No properties yet.</div>";
-  // stocks valuation
-  const stockLines = state.stocks.map(s=>{
-    const q=s.pos[i]||0; if(!q) return null; return `<div class="row"><div>${s.tkr} ${s.name}</div><div>${q} sh = ${money(q*s.px)}</div></div>`;
-  }).filter(Boolean).join("") || "<div class='tag'>No stocks.</div>";
-  showModal(`<h3>${p.name} — Portfolio</h3>
-    <h4>Real Estate</h4>${propRows}
-    <h4>Stocks</h4>${stockLines}
-  `,[{label:"Close",primary:true,cb:closeModal}]);
-  $("#modalContent").addEventListener("click",(e)=>{
+  const rows=state.tiles.filter(t=>t.type==="prop"&&t.owner===i).map(t=>`
+    <div class="item">
+      <div><strong>${t.name}</strong><div class="tag">${t.desc||""}</div><div class="tag">Rent ${money(currentRent(t))}${t.mortgaged?" • Mortgaged":""}</div></div>
+      <div>
+        <button class="btn" data-act="mort" data-name="${t.name}">Mortgage</button>
+        <button class="btn" data-act="unmort" data-name="${t.name}">Unmortgage</button>
+      </div>
+    </div>`).join("") || `<div class="tag">No properties</div>`;
+  showModal(`<h3>${p.name} — Portfolio</h3>${rows}`,[{label:"Close",primary:true,cb:closeModal}]);
+  $("#modalContent").addEventListener("click",e=>{
     const b=e.target.closest("button[data-act]"); if(!b) return;
-    const name=b.getAttribute("data-name"); const t=state.tiles.find(x=>x.name===name);
+    const t=state.tiles.find(x=>x.name===b.getAttribute("data-name"));
     if(!t) return;
-    if(b.getAttribute("data-act")==="mort") mortgageTile(t, current());
-    if(b.getAttribute("data-act")==="unmort") unmortgageTile(t, current());
-    persist(); openPortfolio();
-  }, {once:true});
+    if(b.getAttribute("data-act")==="mort" && !t.mortgaged && t.owner===i){ t.mortgaged=true; p.cash+=Math.round(adjPrice(t)*0.5); log(`Mortgaged ${t.name}.`); }
+    if(b.getAttribute("data-act")==="unmort" && t.mortgaged && t.owner===i){ const cost=Math.round(adjPrice(t)*0.5*1.1); if(p.cash>=cost){ p.cash-=cost; t.mortgaged=false; log(`Unmortgaged ${t.name}.`);} else { log("Not enough cash."); } }
+    renderAll(); persist(); openPortfolio();
+  },{once:true});
 }
 
-/* ----------------- Detention ----------------- */
-function sendToJail(p){ p.inJail=true; p.pos=10; p.jailTries=0; renderTokens(); log(`${p.name} sent to Detention.`); }
-
-/* ----------------- Liquidation / Bankruptcy ----------------- */
-function autoLiquidate(p){
-  // Sell stocks first, then mortgage properties, until cash >= 0 or nothing left
-  const i=state.players.indexOf(p);
-  // sell stocks at 30% discount (panic)
-  const worthStocks = state.stocks.reduce((s,st)=>s+((st.pos[i]||0)*st.px),0);
-  if(worthStocks>0){
-    state.stocks.forEach(st=>{
-      const q=st.pos[i]||0; if(q>0){ const proceeds=q*st.px*0.7; st.pos[i]=0; p.cash+=proceeds; log(`Forced sale: ${st.tkr} ${q}sh for ${money(proceeds)}.`); }
-    });
-  }
-  // mortgage all properties
-  state.tiles.filter(t=>t.type==="prop" && t.owner===i && !t.mortgaged).forEach(t=>{
-    t.mortgaged=true; const val=Math.round(adjPrice(t)*0.5); p.cash+=val; log(`Mortgaged ${t.name} for ${money(val)}.`);
-  });
-  renderBoard(); renderPlayers();
-  if(p.cash<0){ log("Still negative after liquidation."); }
+/* ==== BANK / STOCKS / CASINO (lightweight UI hooks) ==== */
+function openBank(){
+  const p=current();
+  showModal(`<h3>City Bank</h3>
+    <p>Policy rate ${pct(state.macro.rate)}</p>
+    <div class="row"><input id="amt" class="input" placeholder="Amount" /></div>
+    <div class="row" style="margin-top:8px;gap:8px">
+      <button class="btn" id="loan">Take Loan</button>
+      <button class="btn" id="dep">Deposit</button>
+      <button class="btn" id="with">Withdraw</button>
+    </div>`,
+    [{label:"Close",primary:true,cb:closeModal}]);
+  $("#loan").onclick=()=>{ const a=Number($("#amt").value||0); if(a>0){ p.cash+=a; log(`Loan +${money(a)}.`); closeModal(); renderPanels(); persist(); }};
+  $("#dep").onclick=()=>{ const a=Number($("#amt").value||0); if(a>0&&p.cash>=a){ p.cash-=a; p.deposits=(p.deposits||0)+a; log(`Deposited ${money(a)}.`); closeModal(); renderPanels(); persist(); }};
+  $("#with").onclick=()=>{ const a=Number($("#amt").value||0); if(a>0&&(p.deposits||0)>=a){ p.deposits-=a; p.cash+=a; log(`Withdrew ${money(a)}.`); closeModal(); renderPanels(); persist(); }};
 }
-function liquidateToBank(p){
-  const i=state.players.indexOf(p);
-  // release props
-  state.tiles.forEach(t=>{ if(t.owner===i){ t.owner=null; t.mortgaged=false; }});
-  // clear stocks
-  state.stocks.forEach(s=>{ s.pos[i]=0; });
-  // wipe deposits
-  p.deposits=0; p.loans=[];
+function openStocks(){
+  showModal(`<h3>Stock Exchange</h3><p>Prototype: coming next pass (UI wired).</p>`,[{label:"Close",primary:true,cb:closeModal}]);
 }
-function eliminate(p){
-  const i=state.players.indexOf(p);
-  state.players.splice(i,1);
-  if(state.players.length===1){
-    showModal(`<h3>${state.players[0].name} Wins!</h3><p>Everyone else went bust.</p>`,[{label:"Ok",primary:true,cb:closeModal}]);
-  }
-  if(state.turn>=state.players.length) state.turn=0;
-  renderBoard(); renderPlayers();
+function openCasino(){
+  showModal(`<h3>Casino</h3>
+  <div class="row"><input id="bet" class="input" placeholder="Bet amount" /></div>
+  <div class="row" style="gap:8px;margin-top:8px"><button class="btn" id="coin">Coin (49%)</button><button class="btn" id="roll10">10x (8%)</button></div>`,
+  [{label:"Close",primary:true,cb:closeModal}]);
+  const p=current(), val=()=>Number($("#bet").value||0);
+  $("#coin").onclick=()=>{ const b=val(); if(b>0&&p.cash>=b){ if(Math.random()<0.49){ p.cash+=b; log("Coin WIN"); } else { p.cash-=b; log("Coin LOSE"); } renderPanels(); persist(); }};
+  $("#roll10").onclick=()=>{ const b=val(); if(b>0&&p.cash>=b){ if(Math.random()<0.08){ p.cash+=9*b; log("10x hit!"); } else { p.cash-=b; log("Bust"); } renderPanels(); persist(); }};
 }
 
-/* ----------------- Inspect Tile ----------------- */
-function inspectTile(i){
-  const t=state.tiles[i];
-  let body = `<p>Type: ${t.type.toUpperCase()}</p>`;
-  if(t.type==="prop"){ body += `<p>Price: ${money(adjPrice(t))} • Rent now: ${money(currentRent(t))}</p><p>Owner: ${t.owner!=null?state.players[t.owner].name:"—"}</p>`; }
-  showModal(`<h3>${t.name}</h3>${body}`,[{label:"Close",primary:true,cb:closeModal}]);
+/* ==== CARDS & MACRO ==== */
+function lifeCard(msg){ log(`[Life] ${msg}.`); }
+function newsCard(msg){ log(`[News] ${msg}.`); }
+function macroTick(){
+  // simple drift
+  state.macro.inflation = Math.max(0, state.macro.inflation + (Math.random()*0.006-0.002));
+  state.macro.rate = Math.max(0, Math.min(0.12, state.macro.rate + (state.macro.inflation-0.02)*0.15));
+  state.day++; renderPanels();
+}
+function dailyFinance(p){
+  const dep=p.deposits||0; if(dep>0){ const inc=dep*(state.macro.rate/365); p.deposits+=inc; log(`Deposit interest ${money(inc)}.`); }
 }
 
-/* ----------------- Modal ----------------- */
+/* ==== UI WIRING ==== */
+$("#rollBtn").onclick=()=>{ if(state.phase==="await-roll"||state.phase==="post-roll"){ roll(); persist(); } };
+$("#endBtn").onclick=()=>endTurn();
+$("#passBtn").onclick=()=>openPass();
+$("#passGo").onclick=()=>closePass();
+$("#buyBtn").onclick=()=>{ const t=state.tiles[current().pos]; if(t && t.type==="prop" && t.owner==null){ offerBuy(t); } else openPortfolio(); };
+$("#portfolioBtn").onclick=openPortfolio;
+$("#bankBtn").onclick=openBank;
+$("#casinoBtn").onclick=openCasino;
+$("#stocksBtn").onclick=openStocks;
+$("#helpBtn").onclick=()=>{ showModal(`<h3>How to Play</h3><p>Roll, move, buy. Rent floats with inflation. Use Bank if you need liquidity. Pass iPad between turns.</p>`,[{label:"Close",primary:true,cb:closeModal}]); };
+$("#gearBtn").onclick=()=>{ showModal(`<h3>Settings</h3>
+  <label class="item"><span>Fast Play</span><input type="checkbox" ${state.options.fast?"checked":""} id="setFast"></label>
+  <label class="item"><span>Enable Casino</span><input type="checkbox" ${state.options.casino?"checked":""} id="setCasino"></label>
+  <label class="item"><span>Enable Stocks</span><input type="checkbox" ${state.options.stocks?"checked":""} id="setStocks"></label>
+  <label class="item"><span>Thai Labels (β)</span><input type="checkbox" ${state.options.thai?"checked":""} id="setThai"></label>
+`,[{label:"Close",primary:true,cb:closeModal}]);
+  $("#setFast").onchange=e=>state.options.fast=e.target.checked;
+  $("#setCasino").onchange=e=>state.options.casino=e.target.checked;
+  $("#setStocks").onchange=e=>state.options.stocks=e.target.checked;
+  $("#setThai").onchange=e=>state.options.thai=e.target.checked;
+};
+
+/* ==== MODAL + PASS ==== */
 function showModal(html, buttons=[]){
-  const box=$("#modalContent"); box.innerHTML = html + `<div class="btns">${
-    buttons.map((b,i)=>`<button class="btn ${b.class||""} ${b.primary?"primary":""}" data-i="${i}">${b.label}</button>`).join("")
-  }</div>`;
+  const box=$("#modalContent"); box.innerHTML=html+`<div class="btns">${buttons.map((b,i)=>`<button class="btn ${b.class||""} ${b.primary?"primary":""}" data-i="${i}">${b.label}</button>`).join("")}</div>`;
   $("#modal").classList.add("open");
-  $$("#modalContent .btn").forEach(btn=>{
-    btn.addEventListener("click",()=>{
-      const i=+btn.getAttribute("data-i"); const b=buttons[i]; if(b&&b.cb) b.cb();
-    });
-  });
+  $$("#modalContent .btn").forEach(btn=>btn.onclick=()=>{ const i=+btn.getAttribute("data-i"); const b=buttons[i]; if(b&&b.cb) b.cb(); });
 }
 function closeModal(){ $("#modal").classList.remove("open"); }
-
-/* ----------------- Pass overlay ----------------- */
-function openPass(){ $("#passTitle").textContent = `Pass iPad to ${state.players[state.turn]?.name||"Next"}`; $("#pass").classList.add("open"); }
+function openPass(){ $("#passTitle").textContent=`Pass iPad to ${state.players[(state.turn+1)%state.players.length].name}`; $("#pass").classList.add("open"); }
 function closePass(){ $("#pass").classList.remove("open"); }
 
-/* ----------------- Save/Load ----------------- */
-function persist(){
-  localStorage.setItem("city-ledger-save", JSON.stringify(state, (k,v)=>{
-    if(k==="log") return v.slice(0,200);
-    return v;
-  }));
-}
-function load(){
-  const raw=localStorage.getItem("city-ledger-save"); if(!raw){ log("No save found."); return; }
-  const s=JSON.parse(raw);
-  Object.assign(state, s);
-  renderBoard(); renderPlayers(); renderTop(); renderLog();
-  hint("Save loaded.");
-}
+/* ==== SAVE / LOAD ==== */
+function persist(){ localStorage.setItem("city-ledger-v1", JSON.stringify(state)); }
+function load(){ const raw=localStorage.getItem("city-ledger-v1"); if(!raw) return; const s=JSON.parse(raw); Object.assign(state,s); }
+if("serviceWorker" in navigator){ window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js")); }
 
-/* ----------------- UI ----------------- */
-function setup(){
-  $("#newBtn").onclick=()=>{
-    const names = ($("#playerNames").value||"Player 1, Player 2").split(",").map(x=>x.trim()).filter(Boolean);
-    const key = $("#scenario").value;
-    newGame(names,key); persist();
-  };
-  $("#saveBtn").onclick=persist;
-  $("#loadBtn").onclick=load;
-  $("#rollBtn").onclick=()=>{ if(state.phase==="await-roll"||state.phase==="post-roll"){ roll(); persist(); } };
-  $("#endBtn").onclick=()=>endTurn();
-  $("#passBtn").onclick=openPass;
-  $("#passGo").onclick=closePass;
-  $("#buyBtn").onclick=()=>{
-    const t=state.tiles[current().pos];
-    if(t && t.type==="prop" && t.owner==null){ buyOffer(t); }
-    else openPortfolio();
-  };
-  $("#portfolioBtn").onclick=openPortfolio;
-  $("#bankBtn").onclick=openBank;
-  $("#casinoBtn").onclick=openCasino;
+/* ==== BOOT ==== */
+function boot(){
+  show("#home");
 }
-
-/* ----------------- Boot ----------------- */
-initScenario("bangkok");
-renderBoard();
-newGame(["Player 1","Player 2"],"bangkok");
-setup();
-renderTop();
-
+boot();
 </script>
 </body>
 </html>
