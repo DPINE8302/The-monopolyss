@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Board Tycoon — Pass & Play (iPad)</title>
+<style>
+  :root {
+    --bg: #0b0b0b;
+    --panel: #121212;
+    --ink: #eaeaea;
+    --muted: #a9a9a9;
+    --accent: #3ad1ff;
+    --danger: #ff5a5a;
+    --good: #3cd07e;
+    --tile: #1c1c1c;
+    --card: #151515;
+    --shadow: 0 10px 30px rgba(0,0,0,.35);
+  }
+  html, body { height: 100%; background: var(--bg); color: var(--ink); font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial; }
+  * { box-sizing: border-box; }
+  a { color: var(--accent); text-decoration: none; }
+  .app {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    grid-template-rows: 100vh;
+    gap: 12px;
+    padding: 12px;
+  }
+  @media (max-width: 1100px) {
+    .app { grid-template-columns: 1fr; grid-auto-rows: auto; }
+    .right { order: -1; height: 44vh; }
+    .boardWrap { height: 56vh; }
+  }
+  .boardWrap {
+    background: var(--panel); border-radius: 16px; padding: 12px; box-shadow: var(--shadow);
+    display: grid; place-items: center;
+  }
+  .board {
+    width: min(94vh, 1100px); aspect-ratio: 1 / 1; background: #0f0f0f; border-radius: 16px; position: relative; box-shadow: inset 0 0 0 2px #222;
+    display: grid; grid-template-columns: repeat(11, 1fr); grid-template-rows: repeat(11, 1fr); gap: 4px; padding: 8px;
+  }
+  .tile {
+    background: var(--tile); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 11px; text-align: center; padding: 6px;
+    border: 1px solid #2a2a2a; position: relative;
+  }
+  .center { grid-column: 2 / 11; grid-row: 2 / 11; background: #101010; border: 1px dashed #222; border-radius: 12px; display: grid; place-items: center; }
+  .center h1 { font-weight: 700; letter-spacing: .06em; margin: 0; opacity: .9; }
+  .price { color: var(--muted); font-size: 10px; position: absolute; bottom: 4px; left: 0; right: 0; }
+  .colorbar { position: absolute; top: 0; left: 0; right: 0; height: 6px; border-top-left-radius: 8px; border-top-right-radius: 8px; }
+  .token {
+    position: absolute; width: 18px; height: 18px; border-radius: 50%; border: 2px solid #000; transform: translate(-50%,-50%);
+  }
+  .right {
+    background: var(--panel); border-radius: 16px; padding: 12px; box-shadow: var(--shadow); display: grid; grid-template-rows: auto 1fr auto;
+  }
+  .players { display: grid; grid-auto-rows: minmax(52px, auto); gap: 8px; }
+  .card {
+    background: var(--card); border: 1px solid #2a2a2a; border-radius: 12px; padding: 10px;
+  }
+  .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .tag { font-size: 12px; color: var(--muted); }
+  .bold { font-weight: 700; }
+  .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+  .controls .btn, .full .btn {
+    appearance: none; background: #1c1c1c; color: var(--ink); border: 1px solid #2a2a2a; padding: 12px 10px; border-radius: 12px; font-size: 16px; cursor: pointer;
+  }
+  .controls .btn.primary { background: var(--accent); color: #00131a; border-color: transparent; font-weight: 700; }
+  .controls .btn.warn { background: var(--danger); color: #1a0000; font-weight: 700; }
+  .controls .btn.good { background: var(--good); color: #001a0a; font-weight: 700; }
+  .mini { font-size: 12px; color: var(--muted); margin-top: 6px; }
+  .log { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; line-height: 1.35; height: 160px; overflow: auto; background: #0f0f0f; border: 1px solid #252525; border-radius: 8px; padding: 8px; }
+  .full { grid-column: 1 / -1; }
+  .ownerDot { position: absolute; right: 6px; bottom: 6px; width: 10px; height: 10px; border-radius: 50%; border: 1px solid #000; }
+  /* Modals */
+  .modal, .overlay {
+    position: fixed; inset: 0; display: none; place-items: center; background: rgba(0,0,0,.55); z-index: 50;
+  }
+  .modal.open, .overlay.open { display: grid; }
+  .sheet {
+    background: var(--panel); border: 1px solid #2a2a2a; border-radius: 16px; min-width: min(520px, 92vw); max-width: 92vw; box-shadow: var(--shadow); padding: 16px;
+  }
+  .sheet h3 { margin: 0 0 6px 0; }
+  .sheet p { margin: 6px 0; color: var(--muted); }
+  .sheet .btns { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+  /* Pass overlay */
+  .passOverlay {
+    position: fixed; inset: 0; background: #000; color: #fff; display: none; z-index: 60; align-items: center; justify-content: center; text-align: center; padding: 24px;
+  }
+  .passOverlay.open { display: flex; }
+  .passOverlay .passCard { max-width: 520px; }
+  .passOverlay h2 { margin: 0 0 8px 0; font-size: 28px; }
+  .passOverlay button { margin-top: 16px; padding: 12px 16px; font-size: 18px; border-radius: 12px; border: none; background: var(--accent); color: #00131a; font-weight: 700; }
+  /* Token colors */
+  .t0{background:#ffce33}.t1{background:#7bd1ff}.t2{background:#ff7bd9}.t3{background:#7dff9a}.t4{background:#ff9b7b}.t5{background:#c07bff}
+  /* Property set colors (classic-ish) */
+  .brown{background:#7b4a2e}.lightblue{background:#9ed6ff}.pink{background:#ff9ad6}.orange{background:#ffa552}.red{background:#ff6b6b}.yellow{background:#ffe066}.green{background:#7adf88}.blue{background:#6ca8ff}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="boardWrap">
+    <div id="board" class="board"></div>
+  </div>
+  <aside class="right">
+    <div class="card">
+      <div class="row">
+        <div class="bold">Board Tycoon</div>
+        <div class="tag" id="status">Ready</div>
+      </div>
+      <div class="row" style="margin-top:8px; gap:6px">
+        <input id="playerNames" placeholder="Player names (comma-separated)" style="flex:1; padding:10px; border-radius:10px; border:1px solid #2a2a2a; background:#0f0f0f; color:var(--ink)" />
+        <button class="btn" id="newGame">New</button>
+        <button class="btn" id="saveGame">Save</button>
+        <button class="btn" id="loadGame">Load</button>
+      </div>
+      <div class="mini">Tip: Start with 2–4 players. Pass iPad between turns. Game autosaves after each turn.</div>
+    </div>
+
+    <div class="players" id="players"></div>
+
+    <div class="card full">
+      <div class="row"><div class="bold" id="turnTitle">Your Move</div><div class="tag" id="turnCash"></div></div>
+      <div class="controls">
+        <button class="btn primary" id="rollBtn">🎲 Roll</button>
+        <button class="btn" id="endTurnBtn">End Turn</button>
+        <button class="btn good" id="buyBtn">Buy</button>
+        <button class="btn" id="manageBtn">Manage</button>
+        <button class="btn warn" id="forfeitBtn">Declare Bankruptcy</button>
+        <button class="btn" id="passBtn">Pass iPad</button>
+      </div>
+      <div class="mini" id="hint">Roll to start. Doubles = extra roll. Three doubles in a row = Jail.</div>
+      <div class="log" id="log"></div>
+    </div>
+  </aside>
+</div>
+
+<!-- Modal -->
+<div class="modal" id="modal">
+  <div class="sheet" id="modalContent"></div>
+</div>
+
+<!-- Pass overlay -->
+<div class="passOverlay" id="passOverlay">
+  <div class="passCard">
+    <h2 id="passTitle">Pass iPad to Next Player</h2>
+    <p>When they’re ready, tap continue.</p>
+    <button id="passContinue">Continue</button>
+  </div>
+</div>
+
+<script>
+/** ------------------------------
+ * Minimal Monopoly-style engine
+ * Focus: iPad pass-and-play, clarity, autosave
+ * ------------------------------ */
+
+const $ = (sel) => document.querySelector(sel);
+const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+
+const state = {
+  tiles: [], players: [], turn: 0, phase: 'await-roll', // phases: await-roll, post-roll, buy-offer
+  dice: [0,0], doublesInRow: 0, log: [], jailTurns: 0, // per current player
+};
+
+const COLORS = ['t0','t1','t2','t3','t4','t5'];
+const START_CASH = 1500;
+
+const SETS = {
+  brown: { rent: [2,10,30,90,160,250], price: 60 },
+  lightblue: { rent: [4,20,60,180,320,450], price: 100 },
+  pink: { rent: [6,30,90,270,400,550], price: 140 },
+  orange: { rent: [10,50,150,450,625,750], price: 180 },
+  red: { rent: [14,70,200,550,750,950], price: 220 },
+  yellow: { rent: [16,80,220,600,800,1000], price: 260 },
+  green: { rent: [18,90,250,700,875,1050], price: 300 },
+  blue: { rent: [35,175,500,1100,1300,1500], price: 400 },
+};
+
+const CHANCE = [
+  { t:'Advance to GO (collect $200)', run:(g,p)=>{ moveTo(p,0,true); credit(p,200); } },
+  { t:'Go to Jail (no $200)', run:(g,p)=>{ sendToJail(p); } },
+  { t:'Bank pays you dividend of $50', run:(g,p)=>{ credit(p,50); } },
+  { t:'Pay poor tax of $15', run:(g,p)=>{ debit(p,15); } },
+  { t:'Advance to nearest utility (if owned, pay 10x dice)', run:(g,p)=>{ moveToNearest(p,[12,28]); utilityPay(p); } },
+  { t:'Advance to Illinois Ave (24)', run:(g,p)=>{ moveTo(p,24,true); onLand(p); } },
+];
+
+const CHEST = [
+  { t:'Advance to GO (collect $200)', run:(g,p)=>{ moveTo(p,0,true); credit(p,200); } },
+  { t:'Doctor’s fees – Pay $50', run:(g,p)=>{ debit(p,50); } },
+  { t:'From sale of stock you get $50', run:(g,p)=>{ credit(p,50); } },
+  { t:'Go to Jail (no $200)', run:(g,p)=>{ sendToJail(p); } },
+  { t:'Receive $100', run:(g,p)=>{ credit(p,100); } },
+  { t:'Pay school fees of $50', run:(g,p)=>{ debit(p,50); } },
+];
+
+function log(msg){ state.log.unshift(msg); renderLog(); }
+function credit(p,amt){ p.cash+=amt; log(`+ $${amt} → ${p.name}`); }
+function debit(p,amt){ p.cash-=amt; log(`− $${amt} → ${p.name}`); checkBankruptcy(p); }
+
+function rand(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
+
+function tileIndexToGrid(idx){
+  // board 11x11. Perimeter indices 0..39. Return CSS grid placement (row,col).
+  const pos = idx%40;
+  // bottom row: 0..10 (right->left)
+  if(pos<=10) return {row:11, col:11-pos};
+  // left col: 11..20 (bottom->top)
+  if(pos<=20) return {row:11-(pos-10), col:1};
+  // top row: 21..30 (left->right)
+  if(pos<=30) return {row:1, col:(pos-20)};
+  // right col: 31..39 (top->bottom)
+  return {row:(pos-30), col:11};
+}
+
+function initTiles(){
+  const t = [];
+  // Very compact 40-tile set: GO, properties, rail-ish, utilities, chance/chest, jail, free parking, go to jail, taxes
+  const add = (i,type,name,opts={}) => t.push({i,type,name, ...opts, owner:null, houses:0});
+  add(0,'go','GO',{pay:200});
+
+  const prop = (name,set,price)=>({ type:'prop', name, set, price, base:SETS[set].rent[0] });
+  const rail = (name)=>({ type:'rail', name, price:200 });
+  const util = (name)=>({ type:'util', name, price:150 });
+
+  const seq = [
+    prop('Mediterranean','brown',60), {type:'chest',name:'Community Chest'},
+    prop('Baltic','brown',60), {type:'tax',name:'Income Tax',pay:200}, rail('Reading Railroad'),
+    prop('Oriental','lightblue',100), {type:'chance',name:'Chance'},
+    prop('Vermont','lightblue',100), prop('Connecticut','lightblue',120), {type:'jail',name:'Just Visiting / Jail'},
+    prop('St. Charles','pink',140), util('Electric Company'),
+    prop('States','pink',140), prop('Virginia','pink',160), rail('Pennsylvania Railroad'),
+    prop('St. James','orange',180), {type:'chest',name:'Community Chest'},
+    prop('Tennessee','orange',180), prop('New York','orange',200), {type:'free',name:'Free Parking'},
+    prop('Kentucky','red',220), {type:'chance',name:'Chance'},
+    prop('Indiana','red',220), prop('Illinois','red',240), rail('B&O Railroad'),
+    prop('Atlantic','yellow',260), prop('Ventnor','yellow',260), util('Water Works'),
+    prop('Marvin Gardens','yellow',280), {type:'gotojail',name:'Go To Jail'},
+    prop('Pacific','green',300), prop('North Carolina','green',300), {type:'chest',name:'Community Chest'},
+    prop('Pennsylvania','green',320), rail('Short Line'),
+    {type:'chance',name:'Chance'}, prop('Park Place','blue',350),
+    {type:'tax',name:'Luxury Tax',pay:100}, prop('Boardwalk','blue',400),
+  ];
+  let i=1;
+  for(const s of seq){ add(i, s.type, s.name, s); i++; }
+  state.tiles = t;
+}
+
+function renderBoard(){
+  const board = $('#board');
+  board.innerHTML = '';
+  // draw tiles around the edge
+  for(let i=0;i<40;i++){
+    const pos = tileIndexToGrid(i);
+    const el = document.createElement('div');
+    el.className = 'tile';
+    el.style.gridRow = pos.row;
+    el.style.gridColumn = pos.col;
+    const tile = state.tiles[i];
+    let colorbar = '';
+    if(tile.type==='prop'){
+      const colorClass = ({
+        brown:'brown', lightblue:'lightblue', pink:'pink', orange:'orange',
+        red:'red', yellow:'yellow', green:'green', blue:'blue'
+      })[tile.set];
+      colorbar = `<div class="colorbar ${colorClass}"></div>`;
+    }
+    const price = tile.price ? `<div class="price">$${tile.price}</div>` : '';
+    const ownerDot = tile.owner!=null ? `<div class="ownerDot ${COLORS[tile.owner]}"></div>` : '';
+    el.innerHTML = `${colorbar}<div>${tile.name||tile.type.toUpperCase()}</div>${price}${ownerDot}`;
+    el.addEventListener('click', ()=> inspectTile(i));
+    board.appendChild(el);
+  }
+  // center
+  const center = document.createElement('div');
+  center.className = 'center';
+  center.innerHTML = `<div style="text-align:center"><h1>BOARD TYCOON</h1><div class="tag">Pass & Play · iPad</div></div>`;
+  board.appendChild(center);
+  renderTokens();
+}
+
+function renderTokens(){
+  // remove old tokens
+  $$('.token').forEach(n=>n.remove());
+  const board = $('#board');
+  state.players.forEach((p,idx)=>{
+    const pos = tileIndexToGrid(p.pos);
+    const token = document.createElement('div');
+    token.className = `token ${COLORS[idx]}`;
+    // offset tokens per tile
+    const off = 8 * idx;
+    token.style.top = `calc(((100% - 16px)/11) * ${pos.row-0.5} + ${idx?'-':''}${off}px)`;
+    token.style.left = `calc(((100% - 16px)/11) * ${pos.col-0.5} + ${idx?'':'+'}${off}px)`;
+    board.appendChild(token);
+  });
+}
+
+function renderPlayers(){
+  const wrap = $('#players');
+  wrap.innerHTML = '';
+  state.players.forEach((p,idx)=>{
+    const card = document.createElement('div');
+    card.className = 'card';
+    const active = idx===state.turn ? ' (active)' : '';
+    card.innerHTML = `
+      <div class="row">
+        <div class="bold">• <span class="${COLORS[idx]} ownerDot" style="position:static"></span> ${p.name}${active}</div>
+        <div>$${p.cash}</div>
+      </div>
+      <div class="tag">Pos: ${p.pos} ${p.inJail?'— In Jail':''}</div>
+      <div class="mini">Props: ${ownedList(idx)}</div>
+    `;
+    wrap.appendChild(card);
+  });
+  $('#turnTitle').textContent = `Turn: ${state.players[state.turn]?.name||'-'}`;
+  $('#turnCash').textContent = state.players[state.turn] ? `$${state.players[state.turn].cash}` : '';
+}
+
+function renderLog(){
+  $('#log').innerHTML = state.log.map(l=>`• ${l}`).join('\n');
+}
+
+function ownedList(ownerIdx){
+  return state.tiles
+    .filter(t=>t.owner===ownerIdx && t.type==='prop')
+    .map(t=>t.name).join(', ') || '—';
+}
+
+function newGame(names){
+  initTiles();
+  const players = names.map((n)=>({
+    name:n.trim(), cash: START_CASH, pos:0, inJail:false, jailTurns:0
+  })).slice(0,6);
+  state.players = players;
+  state.turn = 0;
+  state.phase = 'await-roll';
+  state.log = ['New game started.'];
+  state.doublesInRow = 0;
+  renderBoard(); renderPlayers(); renderLog();
+  hint(`Roll, move, act. Doubles = extra roll.`)
+}
+
+function hint(t){ $('#hint').textContent = t; }
+function status(t){ $('#status').textContent = t; }
+
+function rollDice(){
+  const p = currentPlayer();
+  if(!p) return;
+  if(p.inJail){
+    // Simple jail logic: pay $50 to leave OR try doubles
+    const d1 = rand(1,6), d2 = rand(1,6);
+    state.dice=[d1,d2];
+    log(`${p.name} rolls ${d1} + ${d2} in Jail.`);
+    if(d1===d2){ p.inJail=false; p.jailTurns=0; log('Doubles! Free from Jail.'); moveSteps(p,d1+d2); postMove(d1===d2); }
+    else{
+      p.jailTurns++;
+      if(p.jailTurns>=3){ debit(p,50); p.inJail=false; p.jailTurns=0; log('Paid $50 after 3 tries. Released.'); moveSteps(p,d1+d2); postMove(false); }
+      else{ endTurn(); }
+    }
+    return;
+  }
+
+  const d1 = rand(1,6), d2 = rand(1,6);
+  state.dice = [d1,d2];
+  log(`${p.name} rolls ${d1} + ${d2}.`);
+  moveSteps(p, d1+d2);
+  if(d1===d2){
+    state.doublesInRow++;
+    if(state.doublesInRow===3){
+      log('Three doubles in a row → Jail!');
+      sendToJail(p);
+      endTurn(true);
+      return;
+    }
+    postMove(true);
+  } else {
+    state.doublesInRow=0;
+    postMove(false);
+  }
+}
+
+function moveSteps(p,steps){
+  const old = p.pos;
+  p.pos = (p.pos + steps) % 40;
+  renderTokens();
+  if(p.pos < old){ credit(p,200); log(`${p.name} passed GO (+$200).`); }
+  onLand(p);
+}
+
+function moveTo(p, idx, passGo=false){
+  const old = p.pos;
+  p.pos = idx%40;
+  renderTokens();
+  if(passGo && p.pos < old){ credit(p,200); }
+}
+
+function onLand(p){
+  const tile = state.tiles[p.pos];
+  if(!tile){ return; }
+  status(`${p.name} → ${tile.name}`);
+  switch(tile.type){
+    case 'prop':
+      if(tile.owner==null){
+        state.phase='buy-offer'; showBuyOffer(tile);
+      } else if(tile.owner!==state.turn){
+        payRent(p, state.players[tile.owner], tile);
+      }
+      break;
+    case 'rail':
+      if(tile.owner==null){ state.phase='buy-offer'; showBuyOffer(tile); }
+      else if(tile.owner!==state.turn){ payRailRent(p, state.players[tile.owner]); }
+      break;
+    case 'util':
+      if(tile.owner==null){ state.phase='buy-offer'; showBuyOffer(tile); }
+      else if(tile.owner!==state.turn){ utilityPay(p); }
+      break;
+    case 'tax':
+      debit(p, tile.pay||100);
+      break;
+    case 'chance':
+      drawCard(CHANCE);
+      break;
+    case 'chest':
+      drawCard(CHEST);
+      break;
+    case 'gotojail':
+      sendToJail(p);
+      break;
+    case 'jail':
+    case 'free':
+    default:
+      // nothing
+      break;
+  }
+}
+
+function sendToJail(p){
+  p.inJail = true; p.pos = 10; p.jailTurns=0; renderTokens(); log(`${p.name} goes to Jail.`);
+}
+
+function payRent(p, owner, tile){
+  // very simple rent model: base * set completeness bonus
+  let rent = tile.base || 10;
+  const sameSetOwned = state.tiles.filter(t=>t.type==='prop' && t.set===tile.set && t.owner===state.tiles[tile.i]?.owner).length;
+  const totalInSet = state.tiles.filter(t=>t.type==='prop' && t.set===tile.set).length;
+  if(sameSetOwned===totalInSet){ rent *= 2; } // set bonus
+  debit(p, rent); credit(owner, rent);
+  log(`${p.name} pays $${rent} rent to ${owner.name} for ${tile.name}.`);
+}
+
+function payRailRent(p, owner){
+  const railsOwned = state.tiles.filter(t=>t.type==='rail' && t.owner===state.tiles.find(tt=>tt.type==='rail')?.owner && t.owner===ownerIndex(owner)).length;
+  const rent = [25,50,100,200][Math.max(0,railsOwned-1)] || 25;
+  debit(p, rent); credit(owner, rent);
+  log(`${p.name} pays $${rent} railroad rent to ${owner.name}.`);
+}
+
+function utilityPay(p){
+  const owner = utilityOwnerAt(p.pos);
+  if(owner==null || owner===state.turn) return;
+  const count = state.tiles.filter(t=>t.type==='util' && t.owner===owner).length;
+  const factor = count===2 ? 10 : 4;
+  const amt = (state.dice[0]+state.dice[1]) * factor;
+  debit(p, amt); credit(state.players[owner], amt);
+  log(`${p.name} pays $${amt} utility to ${state.players[owner].name}.`);
+}
+
+function ownerIndex(playerRef){
+  return state.players.indexOf(playerRef);
+}
+
+function utilityOwnerAt(idx){
+  const tile = state.tiles[idx];
+  if(tile.type!=='util') return null;
+  return tile.owner;
+}
+
+function drawCard(deck){
+  const card = deck[rand(0, deck.length-1)];
+  showModal(`<h3>${card.t.includes('Jail')?'🚓 ':''}${card.t}</h3><p>Tap continue to apply.</p>`,
+    [{label:'Continue', primary:true, cb:()=>{ card.run(state, currentPlayer()); postLandContinue(); }}]
+  );
+}
+
+function showBuyOffer(tile){
+  const p = currentPlayer();
+  const price = tile.price||100;
+  showModal(`
+    <h3>Buy ${tile.name}?</h3>
+    <p>Price: $${price} &nbsp;|&nbsp; You have: $${p.cash}</p>
+  `,[
+    {label:'Buy', primary:true, cb:()=>{ if(p.cash>=price){ debit(p,price); tile.owner=state.turn; log(`${p.name} bought ${tile.name}.`); renderBoard(); renderPlayers(); postLandContinue(); } else { log('Not enough cash.'); postLandContinue(); } }},
+    {label:'Skip (Auction later)', cb:()=>{ log(`${p.name} skipped buying ${tile.name}.`); postLandContinue(); }}
+  ]);
+}
+
+function postLandContinue(){
+  closeModal();
+  state.phase='post-roll';
+  hint('End Turn or roll again if you rolled doubles.');
+}
+
+function postMove(rolledDoubles){
+  state.phase = 'post-roll';
+  if(rolledDoubles){
+    hint('Doubles! You may roll again or end turn.');
+  } else {
+    hint('Choose: Buy/Manage (if applicable) or End Turn.');
+  }
+  renderPlayers();
+}
+
+function endTurn(silent=false){
+  state.phase='await-roll';
+  state.turn = (state.turn+1) % state.players.length;
+  state.doublesInRow=0;
+  hint('Pass iPad, then Roll.');
+  renderPlayers();
+  if(!silent) openPass();
+  persist();
+}
+
+function currentPlayer(){ return state.players[state.turn]; }
+
+function checkBankruptcy(p){
+  if(p.cash>=0) return;
+  showModal(`<h3>${p.name} is Bankrupt</h3><p>All properties return to bank.</p>`,[
+    {label:'Continue', primary:true, cb:()=>{
+      // release properties
+      state.tiles.forEach(t=>{ if(t.owner===state.players.indexOf(p)) t.owner=null; });
+      // remove player
+      const idx = state.players.indexOf(p);
+      state.players.splice(idx,1);
+      if(state.players.length===1){
+        log(`${state.players[0].name} wins!`);
+        showModal(`<h3>${state.players[0].name} Wins!</h3><p>Game over.</p>`,[{label:'Ok', primary:true, cb:closeModal}]);
+      } else {
+        if(state.turn>=state.players.length) state.turn=0;
+        renderBoard(); renderPlayers(); closeModal(); persist();
+      }
+    }}
+  ]);
+}
+
+function inspectTile(i){
+  const t = state.tiles[i];
+  const owner = t.owner!=null ? state.players[t.owner].name : '—';
+  const price = t.price ? `$${t.price}` : '—';
+  showModal(`
+    <h3>${t.name}</h3>
+    <p>Type: ${t.type.toUpperCase()} &nbsp;|&nbsp; Price: ${price} &nbsp;|&nbsp; Owner: ${owner}</p>
+  `,[{label:'Close', primary:true, cb:closeModal}]);
+}
+
+function showModal(html, buttons=[]){
+  $('#modalContent').innerHTML = html + `<div class="btns">${buttons.map((b,i)=>`
+    <button class="btn ${b.primary?'primary':''}" data-i="${i}">${b.label}</button>`).join('')}</div>`;
+  $('#modal').classList.add('open');
+  $$('#modalContent .btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const i = +btn.getAttribute('data-i'); const b = buttons[i];
+      if(b && typeof b.cb==='function') b.cb();
+    });
+  });
+}
+function closeModal(){ $('#modal').classList.remove('open'); }
+
+function openPass(){
+  const next = state.players[state.turn]?.name || 'Next Player';
+  $('#passTitle').textContent = `Pass iPad to ${next}`;
+  $('#passOverlay').classList.add('open');
+}
+function closePass(){ $('#passOverlay').classList.remove('open'); }
+
+function persist(){
+  localStorage.setItem('board-tycoon-save', JSON.stringify(state, (k,v)=>{
+    if(k==='log') return v.slice(0,200); // truncate
+    if(k==='dice') return v;
+    return v;
+  }));
+}
+function loadSaved(){
+  const raw = localStorage.getItem('board-tycoon-save');
+  if(!raw){ log('No save found.'); return; }
+  const saved = JSON.parse(raw);
+  Object.assign(state, saved);
+  // Reattach methods/derived
+  renderBoard(); renderPlayers(); renderLog();
+  hint('Save loaded.');
+}
+
+function setupUI(){
+  $('#newGame').addEventListener('click', ()=>{
+    const input = $('#playerNames').value.trim() || 'Player 1, Player 2';
+    const names = input.split(',').map(s=>s.trim()).filter(Boolean);
+    newGame(names);
+    persist();
+  });
+  $('#rollBtn').addEventListener('click', ()=>{
+    if(state.phase!=='await-roll' && state.phase!=='post-roll'){ hint('Action in progress…'); return; }
+    rollDice(); renderPlayers(); persist();
+  });
+  $('#endTurnBtn').addEventListener('click', ()=> endTurn());
+  $('#buyBtn').addEventListener('click', ()=>{
+    const p = currentPlayer();
+    const t = state.tiles[p.pos];
+    if(state.phase==='buy-offer' && (t.type==='prop'||t.type==='rail'||t.type==='util')){
+      // same as pressing Buy in modal-less quick flow
+      if(t.owner==null && p.cash>=t.price){ debit(p,t.price); t.owner=state.turn; log(`${p.name} bought ${t.name}.`); renderBoard(); renderPlayers(); state.phase='post-roll'; persist(); }
+      else log('Cannot buy now.');
+    } else {
+      log('No property to buy on this tile.');
+    }
+  });
+  $('#manageBtn').addEventListener('click', ()=>{
+    const owned = state.tiles.filter(t=>t.owner===state.turn && t.type==='prop');
+    if(!owned.length){ showModal('<h3>Manage</h3><p>You own no properties yet.</p>',[{label:'Close', primary:true, cb:closeModal}]); return; }
+    const html = `
+      <h3>Manage Properties</h3>
+      <p>Mortgage (gain half price) / Unmortgage (pay half price + 10%).</p>
+      ${owned.map((t,i)=>`
+        <div class="row" style="margin:6px 0">
+          <div>${t.name}</div>
+          <div>
+            <button class="btn" data-act="mortgage" data-name="${t.name}">Mortgage</button>
+            <button class="btn" data-act="unmortgage" data-name="${t.name}">Unmortgage</button>
+          </div>
+        </div>
+      `).join('')}
+    `;
+    showModal(html, [{label:'Done', primary:true, cb:closeModal}]);
+    $('#modalContent').addEventListener('click', (e)=>{
+      const b = e.target.closest('button[data-act]');
+      if(!b) return;
+      const t = state.tiles.find(x=>x.name===b.getAttribute('data-name'));
+      const act = b.getAttribute('data-act');
+      if(act==='mortgage' && !t.mortgaged){ t.mortgaged=true; const val=Math.floor((t.price||0)/2); credit(currentPlayer(), val); log(`Mortgaged ${t.name} (+$${val}).`); renderPlayers(); persist(); }
+      if(act==='unmortgage' && t.mortgaged){ const val=Math.floor((t.price||0)/2*1.1); if(currentPlayer().cash>=val){ debit(currentPlayer(), val); t.mortgaged=false; log(`Unmortgaged ${t.name} (-$${val}).`); renderPlayers(); persist(); } else { log('Not enough cash.'); } }
+    }, {once:true});
+  });
+  $('#forfeitBtn').addEventListener('click', ()=>{
+    const p = currentPlayer();
+    checkBankruptcy({ ...p, cash:-1 }); // trigger modal flow
+  });
+  $('#passBtn').addEventListener('click', openPass);
+  $('#passContinue').addEventListener('click', closePass);
+  $('#saveGame').addEventListener('click', persist);
+  $('#loadGame').addEventListener('click', loadSaved);
+}
+
+// Boot
+initTiles();
+renderBoard();
+setupUI();
+// Optional: preload two players
+newGame(['Player 1','Player 2']);
+
+</script>
+</body>
+</html>
