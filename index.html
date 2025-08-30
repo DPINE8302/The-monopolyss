@@ -3,131 +3,160 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>City Ledger — Live Economy</title>
+<title>City Ledger — Live Economy (Deluxe)</title>
 
 <!-- iOS PWA -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="City Ledger">
-<link rel="apple-touch-icon" href="icons/icon-192.png">
-<link rel="manifest" href="manifest.webmanifest">
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="apple-touch-icon" href="icons/icon-192.png" />
 <meta name="theme-color" content="#0b0b0b">
 
 <style>
 :root{
-  --bg:#0b0b0b;--panel:#121212;--ink:#f2f2f2;--mut:#a8a8a8;--edge:#242424;--accent:#4dd2ff;
-  --good:#35d07f;--warn:#ff6b6b;--card:#151515;--shadow:0 12px 30px rgba(0,0,0,.35)
+  --bg:#0b0b0b;--panel:#111214;--card:#141519;--ink:#f2f5f7;--mut:#a7b0b7;--edge:#242831;
+  --accent:#49d5ff;--good:#36d07d;--warn:#ff6b6b;--gold:#f3c969;
+  --shadow:0 18px 50px rgba(0,0,0,.5);--inner:inset 0 0 0 1px #1e232b;--glass:rgba(255,255,255,.06);
 }
-*{box-sizing:border-box} html,body{height:100%;background:var(--bg);color:var(--ink);font-family:-apple-system,system-ui,Inter,Roboto,Arial}
+*{box-sizing:border-box;touch-action:manipulation}
+html,body{height:100%;margin:0;background:radial-gradient(1200px 800px at 65% -10%, #1b2030 0%, #0b0d12 50%, #070809 100%);color:var(--ink);font-family:-apple-system,system-ui,Inter,Roboto,Arial}
 a{color:var(--accent);text-decoration:none}
+button{cursor:pointer}
 .app{min-height:100vh;display:grid;grid-template-rows:auto 1fr}
-.topbar{padding:10px 14px;border-bottom:1px solid var(--edge);background:rgba(0,0,0,.35);backdrop-filter:blur(6px);position:sticky;top:0;z-index:20}
-.brand{font-weight:700;letter-spacing:.04em}
+
+/* Topbar */
+.topbar{position:sticky;top:0;z-index:30;backdrop-filter:blur(8px);background:linear-gradient(180deg, rgba(0,0,0,.45), rgba(0,0,0,.15));border-bottom:1px solid #20242d}
+.topbar .row{padding:10px 14px}
+
+/* Screens */
 .screen{display:none}
 .screen.active{display:block}
-.container{max-width:1200px;margin:0 auto;padding:16px}
-.grid{display:grid;gap:12px}
-.panel{background:var(--panel);border:1px solid var(--edge);border-radius:16px;box-shadow:var(--shadow);padding:16px}
+.container{max-width:1400px;margin:0 auto;padding:16px}
 
-.btn{appearance:none;border:1px solid var(--edge);background:#1b1b1b;color:var(--ink);padding:12px 14px;border-radius:12px;cursor:pointer;font-size:16px}
+/* Buttons & Inputs */
+.btn{appearance:none;border:1px solid #2a2f39;background:#171a21;color:var(--ink);padding:12px 14px;border-radius:12px;box-shadow:var(--inner)}
 .btn.primary{background:var(--accent);border-color:transparent;color:#00121a;font-weight:700}
 .btn.good{background:var(--good);border-color:transparent;color:#00150a;font-weight:700}
 .btn.warn{background:var(--warn);border-color:transparent;color:#2a0000;font-weight:700}
-.btn.ghost{background:transparent;border:1px dashed var(--edge)}
+.btn.ghost{background:transparent;border:1px dashed #2a2f39}
+.input,select{width:100%;background:#0e1117;border:1px solid #2a2f39;color:var(--ink);border-radius:12px;padding:12px 14px}
 
-.input, select{width:100%;background:#0f0f0f;border:1px solid var(--edge);color:var(--ink);border-radius:12px;padding:12px 14px}
+/* Typo */
+.h1{font-size:32px;font-weight:900;letter-spacing:.04em;margin:0}
+.h2{font-size:20px;font-weight:800;margin:0}
+.hint{color:var(--mut);font-size:13px}
+.tag{color:var(--mut);font-size:12px}
+
+/* Panels */
+.panel{background:linear-gradient(180deg, #0f131b, #0c0f15);border:1px solid #212633;border-radius:18px;box-shadow:var(--shadow);padding:16px}
+.card{background:var(--card);border:1px solid #232835;border-radius:14px;padding:12px;box-shadow:var(--inner)}
 .row{display:flex;gap:10px;align-items:center}
 .row.spread{justify-content:space-between}
-.tag{color:var(--mut);font-size:12px}
-.h1{font-size:28px;font-weight:800;margin:0}
-.h2{font-size:20px;font-weight:700;margin:0}
-.hint{color:var(--mut);font-size:13px;margin-top:6px}
+.grid{display:grid;gap:12px}
 
 /* Home */
 .hero{display:grid;gap:16px;place-items:center;text-align:center;padding:48px 12px}
-.heroTitle{font-size:36px;font-weight:900;letter-spacing:.06em}
+.heroTitle{font-size:40px;font-weight:900;letter-spacing:.06em}
 .heroSub{color:var(--mut)}
 
-/* Setup Wizard */
+/* Wizard */
 .wizard{display:grid;grid-template-columns:1fr 420px;gap:12px}
-@media (max-width:1100px){.wizard{grid-template-columns:1fr}}
-.stepTitle{margin-bottom:8px}
-.list{display:grid;gap:8px}
-.item{display:flex;justify-content:space-between;gap:10px;align-items:center;background:var(--card);border:1px solid var(--edge);padding:10px;border-radius:12px}
+@media (max-width:1200px){.wizard{grid-template-columns:1fr}}
+.item{display:flex;justify-content:space-between;gap:10px;align-items:center;background:var(--glass);border:1px solid #232835;padding:10px;border-radius:12px}
 
-/* Game */
-.play{display:grid;grid-template-columns:1fr 420px;gap:12px}
-@media (max-width:1100px){.play{grid-template-columns:1fr}}
-.boardWrap{display:grid;place-items:center}
-.board{width:min(94vh,1100px);aspect-ratio:1;background:#0f0f0f;border-radius:16px;border:1px solid #222;display:grid;grid-template-columns:repeat(11,1fr);grid-template-rows:repeat(11,1fr);gap:4px;padding:8px;position:relative}
-.tile{background:#121212;border:1px solid #222;border-radius:10px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:11px;padding:6px;position:relative;cursor:pointer}
-.bar{position:absolute;top:0;left:0;right:0;height:6px;border-top-left-radius:10px;border-top-right-radius:10px}
+/* Play zone */
+.play{display:grid;grid-template-columns:1fr 460px;gap:12px}
+@media (max-width:1200px){.play{grid-template-columns:1fr}}
+.stage{position:relative;border-radius:22px;background:
+  radial-gradient(500px 220px at 50% 0%, rgba(73,213,255,.18), transparent 60%),
+  linear-gradient(180deg,#101520 0%, #0c0f14 60%, #0a0c10 100%);
+border:1px solid #202633;box-shadow:0 40px 120px rgba(0,0,0,.6), inset 0 0 0 1px #191f2a;overflow:hidden}
+.neonEdge{position:absolute;inset:0;border-radius:22px;box-shadow:inset 0 0 120px rgba(73,213,255,.04), inset 0 0 24px rgba(73,213,255,.05);pointer-events:none}
+
+/* Board (11x11) */
+.board{width:min(96vh,1180px);aspect-ratio:1;margin:auto;display:grid;grid-template-columns:repeat(11,1fr);grid-template-rows:repeat(11,1fr);gap:5px;padding:10px;position:relative}
+.tile{
+  position:relative;background:#12151c;border:1px solid #222a36;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;text-align:center;font-size:11px;padding:6px;
+  box-shadow:0 8px 22px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.02);
+  transition:transform .12s ease, box-shadow .12s ease;
+}
+.tile:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(0,0,0,.45), inset 0 0 0 1px rgba(255,255,255,.06)}
+.bar{position:absolute;top:0;left:0;right:0;height:7px;border-top-left-radius:12px;border-top-right-radius:12px}
 .price{position:absolute;bottom:4px;left:0;right:0;color:var(--mut);font-size:10px}
 .owner{position:absolute;right:6px;bottom:6px;width:10px;height:10px;border-radius:50%;border:1px solid #000}
-.center{grid-column:2/11;grid-row:2/11;border:1px dashed #222;border-radius:12px;display:grid;place-items:center}
-.token{position:absolute;width:18px;height:18px;border-radius:50%;border:2px solid #000;transform:translate(-50%,-50%)}
+.center{grid-column:2/11;grid-row:2/11;border:1px dashed #27303f;border-radius:14px;display:grid;place-items:center;background:radial-gradient(800px 400px at 50% 10%, rgba(255,255,255,.03), transparent)}
+.centerInner{text-align:center}
+.centerInner .logo{font-size:28px;font-weight:900;letter-spacing:.06em}
+.centerInner .sub{color:var(--mut)}
 
+/* Tokens + motion lanes */
+.token{position:absolute;width:20px;height:20px;border-radius:50%;border:2px solid #000;transform:translate(-50%,-50%);transition:top .28s cubic-bezier(.2,.8,.2,1), left .28s cubic-bezier(.2,.8,.2,1)}
+.t0{background:#ffd452}.t1{background:#7bd1ff}.t2{background:#ff9ae0}.t3{background:#7dff9a}.t4{background:#ff9b7b}.t5{background:#c99bff}
+
+/* Sidebar HUD */
 .sidebar{display:grid;grid-template-rows:auto auto 1fr auto;gap:12px}
-.card{background:var(--card);border:1px solid var(--edge);border-radius:12px;padding:12px}
 .actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.actions .btn{font-size:15px}
-.log{height:180px;overflow:auto;background:#0f0f0f;border:1px solid #252525;border-radius:8px;padding:8px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;line-height:1.35}
+.log{height:200px;overflow:auto;background:#0f1218;border:1px solid #242b36;border-radius:10px;padding:8px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;line-height:1.35}
 
-/* Modals + Pass overlay */
-.modal{position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,.55);z-index:50}
+/* Modal & Pass */
+.modal{position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,.6);z-index:60}
 .modal.open{display:grid}
-.sheet{background:var(--panel);border:1px solid var(--edge);border-radius:16px;min-width:min(560px,94vw);max-width:94vw;padding:16px}
+.sheet{background:linear-gradient(180deg,#10131a,#0c0f14);border:1px solid #232a36;border-radius:16px;min-width:min(620px,94vw);max-width:94vw;padding:16px;box-shadow:var(--shadow)}
 .sheet h3{margin:0 0 6px 0}
 .sheet .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-.pass{position:fixed;inset:0;background:#000;color:#fff;display:none;z-index:60;align-items:center;justify-content:center;text-align:center;padding:24px}
+.pass{position:fixed;inset:0;background:#000;color:#fff;display:none;z-index:80;align-items:center;justify-content:center;text-align:center;padding:24px}
 .pass.open{display:flex}
 
-/* set colors */
+/* Property Set Colors */
 .br{background:#7b4a2e}.lb{background:#9ed6ff}.pk{background:#ff9ad6}.or{background:#ffa552}
 .rd{background:#ff6b6b}.yl{background:#ffe066}.gr{background:#7adf88}.bl{background:#6ca8ff}
-/* token colors */
-.t0{background:#ffd452}.t1{background:#7bd1ff}.t2{background:#ff9ae0}.t3{background:#7dff9a}.t4{background:#ff9b7b}.t5{background:#c99bff}
+
+/* Tiny badges */
+.badge{background:#1a202b;border:1px solid #2a3342;color:var(--mut);padding:2px 6px;border-radius:999px;font-size:11px}
 </style>
 </head>
 <body>
 <div class="app">
-
-  <div class="topbar row spread">
-    <div class="brand">City Ledger</div>
-    <div class="tag" id="statusTop">Ready</div>
+  <div class="topbar">
+    <div class="row spread">
+      <div class="row" style="gap:8px">
+        <span class="badge">PWA</span>
+        <strong>City Ledger Deluxe</strong>
+      </div>
+      <div class="tag" id="statusTop">Ready</div>
+    </div>
   </div>
 
-  <!-- ---------- HOME ---------- -->
+  <!-- HOME -->
   <section id="home" class="screen active">
     <div class="container">
       <div class="panel hero">
-        <div class="heroTitle">LIVE ECONOMY. CLEAN UI. REAL CHAOS.</div>
-        <div class="heroSub">Pass-and-play board game with a living market. Add to Home Screen for full-screen app mode.</div>
+        <div class="heroTitle">A live-economy board with real money scale.</div>
+        <div class="heroSub">Pass-and-play. Add to Home Screen on iPad for full-screen app mode.</div>
         <div class="row" style="gap:12px">
           <button class="btn primary" id="goNew">New Game</button>
           <button class="btn" id="goResume">Resume</button>
           <button class="btn ghost" id="goSettings">Settings</button>
         </div>
-        <div class="hint">Tip: Safari → Share → <strong>Add to Home Screen</strong> for the app experience.</div>
+        <div class="hint">Safari → Share → <strong>Add to Home Screen</strong></div>
       </div>
     </div>
   </section>
 
-  <!-- ---------- SETUP WIZARD ---------- -->
+  <!-- SETUP -->
   <section id="setup" class="screen">
     <div class="container wizard">
       <div class="panel">
-        <div class="row spread">
-          <h2 class="h2 stepTitle">1. City Pack</h2>
-          <span class="tag" id="macroPreview">—</span>
-        </div>
+        <div class="row spread"><h2 class="h2">1. City & Economy</h2><span class="tag" id="macroPreview">—</span></div>
         <select id="scenario" class="input">
-          <option value="bangkok">Bangkok — Urban Luxe</option>
-          <option value="nyc">New York — Capital Crunch</option>
-          <option value="tokyo">Tokyo — Precision Growth</option>
+          <option value="bangkok">Bangkok — THB</option>
+          <option value="nyc">New York — USD</option>
+          <option value="tokyo">Tokyo — JPY</option>
         </select>
 
-        <h2 class="h2 stepTitle" style="margin-top:12px">2. Players</h2>
+        <h2 class="h2" style="margin-top:14px">2. Players</h2>
         <div class="row" style="gap:8px">
           <input id="playerName" class="input" placeholder="Add player name" />
           <select id="playerColor" class="input" style="max-width:140px">
@@ -139,52 +168,50 @@ a{color:var(--accent);text-decoration:none}
           </select>
           <button class="btn" id="addPlayer">Add</button>
         </div>
-        <div id="playerList" class="list" style="margin-top:8px"></div>
+        <div id="playerList" class="grid" style="margin-top:8px"></div>
 
-        <h2 class="h2 stepTitle" style="margin-top:12px">3. Rules</h2>
-        <div class="list">
-          <label class="item"><span>Fast Play (quicker bankruptcy)</span><input id="optFast" type="checkbox"></label>
-          <label class="item"><span>Enable Casino</span><input id="optCasino" type="checkbox" checked></label>
-          <label class="item"><span>Enable Stocks</span><input id="optStocks" type="checkbox" checked></label>
-          <label class="item"><span>Thai Language Labels (β)</span><input id="optThai" type="checkbox"></label>
-        </div>
+        <h2 class="h2" style="margin-top:14px">3. Rules</h2>
+        <label class="item"><span>Fast Play (harsher bankruptcies)</span><input id="optFast" type="checkbox"></label>
+        <label class="item"><span>Enable Casino</span><input id="optCasino" type="checkbox" checked></label>
+        <label class="item"><span>Enable Stocks</span><input id="optStocks" type="checkbox" checked></label>
+        <label class="item"><span>Thai building names</span><input id="optThai" type="checkbox"></label>
       </div>
 
       <div class="panel">
         <h2 class="h2">Preview</h2>
-        <div id="preview" class="item">
+        <div class="item">
           <div>
             <div class="tag">Players</div>
             <div id="previewPlayers">—</div>
           </div>
           <div style="text-align:right">
             <div class="tag">Starting Cash</div>
-            <div id="previewCash">$2,500</div>
+            <div id="previewCash">—</div>
           </div>
         </div>
         <div class="row" style="margin-top:8px;gap:8px">
           <button class="btn" id="backHome">Back</button>
           <button class="btn primary" id="startGame">Start Game</button>
         </div>
-        <div class="hint">Everything can be changed later in Settings (gear icon in-game).</div>
       </div>
     </div>
   </section>
 
-  <!-- ---------- GAME ---------- -->
+  <!-- GAME -->
   <section id="game" class="screen">
     <div class="container play">
-      <div class="panel boardWrap">
+      <div class="stage panel">
+        <div class="neonEdge"></div>
         <div id="board" class="board"></div>
       </div>
 
       <aside class="sidebar">
         <div class="card">
           <div class="row spread">
-            <div id="turnTitle"><strong>Turn: —</strong></div>
-            <div class="tag" id="macroTag">Inflation 2.0% • Rate 3.5%</div>
+            <div id="turnTitle"><strong>Turn —</strong></div>
+            <div class="tag" id="macroTag">—</div>
           </div>
-          <div class="row" style="margin-top:8px;gap:8px">
+          <div class="row" style="gap:8px;margin-top:8px">
             <button class="btn primary" id="rollBtn">🎲 Roll</button>
             <button class="btn" id="endBtn">End</button>
             <button class="btn" id="passBtn">Pass</button>
@@ -195,7 +222,7 @@ a{color:var(--accent);text-decoration:none}
 
         <div class="card">
           <div class="row spread">
-            <strong>Player Panels</strong>
+            <strong>Players</strong>
             <span class="tag" id="dayTag">Day 1</span>
           </div>
           <div id="players"></div>
@@ -204,7 +231,7 @@ a{color:var(--accent);text-decoration:none}
         <div class="card">
           <div class="row spread">
             <strong>Actions</strong>
-            <span class="tag" id="cashNow">$—</span>
+            <span class="tag" id="cashNow">—</span>
           </div>
           <div class="actions" style="margin-top:8px">
             <button class="btn good" id="buyBtn">Buy / Manage</button>
@@ -225,7 +252,7 @@ a{color:var(--accent);text-decoration:none}
   </section>
 </div>
 
-<!-- Modal + Pass Overlay -->
+<!-- Modal & Pass -->
 <div id="modal" class="modal"><div class="sheet" id="modalContent"></div></div>
 <div id="pass" class="pass"><div>
   <h2 id="passTitle">Pass iPad to Next Player</h2>
@@ -234,69 +261,92 @@ a{color:var(--accent);text-decoration:none}
 </div></div>
 
 <script>
-/* ==== DATA PACKS (names, building details added) ==== */
+/* ================== DATA: Realistic scales ================== */
 const DATA = {
   scenarios:{
+    // Prices chosen to feel real for core locations; rents derive from cap rates.
+    // capRate is annual net yield baseline; rent = (price * capRate)/12, scaled by set & houses/hotel.
     bangkok:{
-      name:"Bangkok",
-      macro:{inflation:0.02, rate:0.035},
+      name:"Bangkok", currency:"THB", locale:"th-TH", symbol:"฿",
+      macro:{inflation:0.02, rate:0.035, capRate:0.045, salary:120000}, // salary per pass GO
       buildings:[
-        ["Khlong Toei Condo","lb",220,18,"High-rise near Rama IV"],
-        ["On Nut Townhome","lb",260,20,"Low-rise cluster near BTS On Nut"],
-        ["Ekkamai Retail","pk",320,26,"Streetfront units near Soi 63"],
-        ["Thonglor Loft","pk",360,30,"Duplex lofts, pet-friendly"],
-        ["Sathorn Office","or",420,34,"Grade-A mid-rise"],
-        ["Silom Shop-House","or",460,38,"4-storey mixed-use"],
-        ["Rama 9 Condo","rd",520,44,"New CBD skyline view"],
-        ["Asok Tower","rd",560,48,"Corporate suites"],
-        ["Ratchada Retail","yl",620,56,"Night market belt"],
-        ["Phrom Phong Penthouse","yl",680,62,"Luxury duplex 48F"],
-        ["Chidlom Luxury","gr",740,70,"Designer residence"],
-        ["Ploenchit Office","gr",820,78,"Embassy row address"],
-        ["Wireless Road HQ","bl",980,95,"Flagship HQ"],
-        ["IconSiam Prime","bl",1200,115,"Riverfront landmark"]
+        {en:"Khlong Toei Condo", th:"คอนโดคลองเตย", set:"lb", price:3500000, photo:"", desc:"High-rise near Rama IV"},
+        {en:"On Nut Townhome", th:"ทาวน์โฮมอ่อนนุช", set:"lb", price:4800000, photo:"", desc:"Low-rise near BTS"},
+        {en:"Ekkamai Retail", th:"รีเทลเอกมัย", set:"pk", price:12000000, photo:"", desc:"Streetfront units"},
+        {en:"Thonglor Loft", th:"ลอฟท์ทองหล่อ", set:"pk", price:18000000, photo:"", desc:"Duplex lofts"},
+        {en:"Sathorn Office", th:"ออฟฟิศสาทร", set:"or", price:38000000, photo:"", desc:"Grade-A mid-rise"},
+        {en:"Silom Shop-House", th:"ตึกแถวสีลม", set:"or", price:25000000, photo:"", desc:"4-storey mixed-use"},
+        {en:"Rama 9 Condo", th:"คอนโดพระราม9", set:"rd", price:8000000, photo:"", desc:"New CBD view"},
+        {en:"Asok Tower", th:"ทาวเวอร์อโศก", set:"rd", price:32000000, photo:"", desc:"Corporate suites"},
+        {en:"Ratchada Retail", th:"รีเทลรัชดา", set:"yl", price:15000000, photo:"", desc:"Night market belt"},
+        {en:"Phrom Phong Penthouse", th:"เพนท์เฮาส์พร้อมพงษ์", set:"yl", price:42000000, photo:"", desc:"Luxury duplex"},
+        {en:"Chidlom Luxury", th:"ชิดลมลักชัวรี่", set:"gr", price:65000000, photo:"", desc:"Designer residence"},
+        {en:"Ploenchit Office", th:"ออฟฟิศเพลินจิต", set:"gr", price:90000000, photo:"", desc:"Embassy row"},
+        {en:"Wireless Road HQ", th:"สำนักงานใหญ่ถ.วิทยุ", set:"bl", price:180000000, photo:"", desc:"Flagship HQ"},
+        {en:"IconSiam Prime", th:"ไอคอนสยามไพร์ม", set:"bl", price:280000000, photo:"", desc:"Riverfront landmark"}
+      ],
+      stocks:[
+        {tkr:"CPN", name:"Central Retail", px:70, sector:"Consumer", vol:0.3, beta:1.0},
+        {tkr:"PTT", name:"PTT Energy", px:45, sector:"Energy", vol:0.25, beta:1.2},
+        {tkr:"KBANK", name:"Kasikorn", px:90, sector:"Financials", vol:0.28, beta:1.1},
+        {tkr:"ADV", name:"AIS", px:60, sector:"Telecom", vol:0.18, beta:0.8},
+        {tkr:"BTS", name:"Bangkok Transit", px:25, sector:"Transport", vol:0.22, beta:1.0}
       ]
     },
     nyc:{
-      name:"New York",
-      macro:{inflation:0.025, rate:0.04},
+      name:"New York", currency:"USD", locale:"en-US", symbol:"$",
+      macro:{inflation:0.025, rate:0.04, capRate:0.037, salary:4000},
       buildings:[
-        ["Queens Walk-up","lb",300,22,"Pre-war near 7 train"],
-        ["Brooklyn Loft","pk",420,34,"Converted warehouse"],
-        ["LIC High-Rise","or",520,44,"Waterfront rental"],
-        ["Midtown Retail","rd",680,58,"Avenue frontage"],
-        ["SoHo Boutique","yl",760,66,"Cast-iron block"],
-        ["Chelsea Office","gr",880,78,"Creative suites"],
-        ["Upper East Penthouse","bl",1200,115,"Park views"],
-        ["Hudson Yards Tower","bl",1500,145,"New landmark"]
+        {en:"Queens Walk-up", th:"ควีนส์วอล์คอัป", set:"lb", price:650000, photo:"", desc:"Pre-war near 7 train"},
+        {en:"Brooklyn Loft", th:"ลอฟต์บรูคลิน", set:"pk", price:1800000, photo:"", desc:"Converted warehouse"},
+        {en:"LIC High-Rise", th:"ไฮไรส์ LIC", set:"or", price:2200000, photo:"", desc:"Waterfront rental"},
+        {en:"Midtown Retail", th:"ค้าปลีกมิดทาวน์", set:"rd", price:5200000, photo:"", desc:"Avenue frontage"},
+        {en:"SoHo Boutique", th:"บูติกโซโห", set:"yl", price:6800000, photo:"", desc:"Cast-iron block"},
+        {en:"Chelsea Office", th:"ออฟฟิศเชลซี", set:"gr", price:9000000, photo:"", desc:"Creative suites"},
+        {en:"Upper East Penthouse", th:"เพนท์เฮาส์ UES", set:"bl", price:18000000, photo:"", desc:"Park views"},
+        {en:"Hudson Yards Tower", th:"ทาวเวอร์ฮัดสันยาร์ด", set:"bl", price:80000000, photo:"", desc:"New landmark"}
+      ],
+      stocks:[
+        {tkr:"AAPL", name:"Apple", px:190, sector:"Tech", vol:0.22, beta:1.0},
+        {tkr:"TSLA", name:"Tesla", px:240, sector:"AutoTech", vol:0.35, beta:1.5},
+        {tkr:"JPM", name:"JPMorgan", px:160, sector:"Financials", vol:0.18, beta:0.9},
+        {tkr:"XOM", name:"Exxon", px:110, sector:"Energy", vol:0.25, beta:1.2},
+        {tkr:"DIS", name:"Disney", px:100, sector:"Media", vol:0.24, beta:1.1}
       ]
     },
     tokyo:{
-      name:"Tokyo",
-      macro:{inflation:0.015, rate:0.02},
+      name:"Tokyo", currency:"JPY", locale:"ja-JP", symbol:"¥",
+      macro:{inflation:0.015, rate:0.02, capRate:0.03, salary:600000},
       buildings:[
-        ["Suginami Apt","lb",260,20,"Family block"],
-        ["Meguro Condo","pk",360,30,"Station adjacent"],
-        ["Shinjuku Retail","or",480,40,"Alley retail"],
-        ["Shibuya Office","rd",620,56,"Tech suites"],
-        ["Ginza Boutique","yl",760,66,"Flagship lane"],
-        ["Roppongi Tower","gr",900,80,"Mixed-use tower"],
-        ["Marunouchi HQ","bl",1300,120,"Financial core"]
+        {en:"Suginami Apt", th:"อพาร์ตเมนต์สึกินามิ", set:"lb", price:80000000, photo:"", desc:"Family block"},
+        {en:"Meguro Condo", th:"คอนโดเมกุโระ", set:"pk", price:110000000, photo:"", desc:"Station adjacent"},
+        {en:"Shinjuku Retail", th:"รีเทลชินจูกุ", set:"or", price:180000000, photo:"", desc:"Alley retail"},
+        {en:"Shibuya Office", th:"ออฟฟิศชิบุยะ", set:"rd", price:260000000, photo:"", desc:"Tech suites"},
+        {en:"Ginza Boutique", th:"บูติกกินซ่า", set:"yl", price:350000000, photo:"", desc:"Flagship lane"},
+        {en:"Roppongi Tower", th:"ทาวเวอร์รปปงหงิ", set:"gr", price:600000000, photo:"", desc:"Mixed-use tower"},
+        {en:"Marunouchi HQ", th:"สำนักงานใหญ่มารุโนะอุจิ", set:"bl", price:900000000, photo:"", desc:"Financial core"}
+      ],
+      stocks:[
+        {tkr:"TOY", name:"Toyota", px:180, sector:"Auto", vol:0.2, beta:0.9},
+        {tkr:"SONY", name:"Sony", px:145, sector:"Electronics", vol:0.22, beta:1.0},
+        {tkr:"NTT", name:"NTT", px:95, sector:"Telecom", vol:0.15, beta:0.7},
+        {tkr:"MUFG", name:"MUFG", px:85, sector:"Financials", vol:0.18, beta:0.8},
+        {tkr:"FAST", name:"Fast Retail", px:100, sector:"Consumer", vol:0.2, beta:1.0}
       ]
     }
   }
 };
 
-/* ==== SIMPLE STORE & NAV ==== */
+/* ================== State ================== */
 const $ = s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
-function show(id){ $$(".screen").forEach(x=>x.classList.remove("active")); $(id).classList.add("active"); }
-
 const COLORS=["t0","t1","t2","t3","t4","t5"];
+
 const state = {
   screen:"home",
   scenario:"bangkok",
-  macro:{inflation:0.02, rate:0.035},
-  tiles:[],
+  currency:{symbol:"฿", locale:"th-TH"},
+  macro:{inflation:0.02, rate:0.035, capRate:0.045, salary:120000},
+  tiles:[], // 0..39
   players:[],
   turn:0,
   day:1,
@@ -304,34 +354,32 @@ const state = {
   doubles:0,
   log:[],
   options:{fast:false, casino:true, stocks:true, thai:false},
-  phase:"await-roll"
+  phase:"await-roll",
+  stocks:[], // {tkr,name,px,sector,vol,beta,pos:{playerIdx:qty}}
+  rentDiscount:null
 };
 
-function money(n){ return "$"+Number(Math.round(n)).toLocaleString(); }
+/* ================== Utilities ================== */
+function show(id){ $$(".screen").forEach(x=>x.classList.remove("active")); $(id).classList.add("active"); }
+function money(n){ return new Intl.NumberFormat(state.currency.locale,{style:"currency",currencyDisplay:"symbol",currency:currCodeForLocale(state.currency.locale),maximumFractionDigits:0}).format(Math.round(n)); }
+function currCodeForLocale(locale){
+  if(locale.startsWith("th")) return "THB";
+  if(locale.startsWith("en")) return "USD";
+  if(locale.startsWith("ja")) return "JPY";
+  return "USD";
+}
+function pct(v){ return (v*100).toFixed(1)+"%"; }
 function log(x){ state.log.unshift(x); renderLog(); }
-function hint(t){ $("#hint").textContent=t; }
 function setStatus(t){ $("#status").textContent=t; $("#statusTop").textContent=t; }
+function hint(t){ $("#hint").textContent=t; }
 
-/* ==== HOME NAV ==== */
+/* ================== Flow: Home / Setup ================== */
 $("#goNew").onclick=()=>{ show("#setup"); renderWizardPreview(); };
 $("#goResume").onclick=()=>{ load(); show("#game"); renderAll(); };
 $("#goSettings").onclick=()=>{ show("#setup"); };
 $("#backHome").onclick=()=>{ show("#home"); };
 
-/* ==== WIZARD ==== */
 const wizardPlayers=[];
-function renderWizardPreview(){
-  const sc = DATA.scenarios[$("#scenario").value];
-  $("#macroPreview").textContent = `${sc.name}: Infl ${pct(sc.macro.inflation)} • Rate ${pct(sc.macro.rate)}`;
-  $("#previewPlayers").textContent = wizardPlayers.length ? wizardPlayers.map(p=>`${p.emoji} ${p.name}`).join(", ") : "—";
-  $("#previewCash").textContent = money(2500);
-}
-$("#scenario").onchange=renderWizardPreview;
-$("#optFast").onchange=e=>state.options.fast=e.target.checked;
-$("#optCasino").onchange=e=>state.options.casino=e.target.checked;
-$("#optStocks").onchange=e=>state.options.stocks=e.target.checked;
-$("#optThai").onchange=e=>state.options.thai=e.target.checked;
-
 $("#addPlayer").onclick=()=>{
   const name=$("#playerName").value.trim()||`Player ${wizardPlayers.length+1}`;
   const color=$("#playerColor").value;
@@ -346,7 +394,20 @@ $("#addPlayer").onclick=()=>{
   $("#playerName").value="";
   renderWizardPreview();
 };
+$("#scenario").onchange=renderWizardPreview;
+$("#optFast").onchange=e=>state.options.fast=e.target.checked;
+$("#optCasino").onchange=e=>state.options.casino=e.target.checked;
+$("#optStocks").onchange=e=>state.options.stocks=e.target.checked;
+$("#optThai").onchange=e=>state.options.thai=e.target.checked;
 
+function renderWizardPreview(){
+  const sc=DATA.scenarios[$("#scenario").value];
+  $("#macroPreview").textContent = `${sc.name}: Infl ${pct(sc.macro.inflation)} • Rate ${pct(sc.macro.rate)} • Cap ${pct(sc.macro.capRate)}`;
+  $("#previewPlayers").textContent = wizardPlayers.length ? wizardPlayers.map(p=>`${p.emoji} ${p.name}`).join(", ") : "—";
+  $("#previewCash").textContent = money(sc.macro.salary*3); // generous start = 3x salary
+}
+
+/* Start Game */
 $("#startGame").onclick=()=>{
   const scKey=$("#scenario").value;
   if(wizardPlayers.length<2){ setStatus("Add at least 2 players"); return; }
@@ -355,50 +416,64 @@ $("#startGame").onclick=()=>{
   show("#game"); renderAll(); persist();
 };
 
-/* ==== GAME INIT ==== */
-function bootstrapGame(scKey, players){
+/* ================== Bootstrapping ================== */
+function bootstrapGame(scKey, wp){
   state.scenario=scKey;
   const sc=DATA.scenarios[scKey];
+  state.currency.symbol = sc.symbol;
+  state.currency.locale = sc.locale;
   state.macro={...sc.macro};
-  state.day=1; state.turn=0; state.doubles=0; state.log=[];
-  state.players = players.map(p=>({name:p.name, color:p.color, emoji:p.emoji, cash:2500, pos:0, inJail:false, jailTries:0, loans:[], deposits:0}));
-  buildTiles(sc);
-  log(`New game: ${sc.name}. Inflation ${pct(state.macro.inflation)}, Rate ${pct(state.macro.rate)}.`);
+  state.day=1; state.turn=0; state.doubles=0; state.log=[]; state.phase="await-roll";
+  state.players = wp.map(p=>({name:p.name,color:p.color,emoji:p.emoji,cash:sc.macro.salary*3,pos:0,inJail:false,jailTries:0,deposits:0,loans:[], housesBuilt:0}));
+  buildBoard(sc);
+  buildStocks(sc);
+  log(`New game: ${sc.name}. Inflation ${pct(state.macro.inflation)}, Rate ${pct(state.macro.rate)}, Cap ${pct(state.macro.capRate)}.`);
   setStatus("Game started");
 }
 
-function buildTiles(sc){
+/* ================== Board ================== */
+function buildBoard(sc){
   state.tiles=[];
-  const add=(i,type,name,opts={})=>state.tiles.push({i,type,name, ...opts, owner:null, mortgaged:false});
-  add(0,"go","GO",{pay:200});
-  const injects={5:["bank","City Bank",{}],7:["chance","Market Chance",{}],10:["jail","Detention",{}],12:["stock","Stock Exchange",{}],15:["chest","Life Event",{}],18:["casino","Casino",{}],20:["free","Free Parking",{}],22:["tax","Property Tax",{pay:200}],25:["chance","Market Chance",{}],28:["stock","Stock Exchange",{}],30:["goto","Go To Detention",{}],35:["chest","Life Event",{}],38:["tax","Luxury Tax",{pay:150}]};
+  const add=(i,type,name,opts={})=>state.tiles.push({i,type,name,owner:null,mortgaged:false,houses:0,hotel:false,...opts});
+  add(0,"go","GO",{pay:sc.macro.salary}); // salary on pass
+  const injects={5:["bank","City Bank",{}],7:["chance","Market Chance",{}],10:["jail","Detention",{}],12:["stock","Stock Exchange",{}],15:["chest","Life Event",{}],18:["casino","Casino",{}],20:["free","Free Parking",{}],22:["tax","Property Tax",{pay:sc.macro.salary*0.8}],25:["chance","Market Chance",{}],28:["stock","Stock Exchange",{}],30:["goto","Go To Detention",{}],35:["chest","Life Event",{}],38:["tax","Luxury Tax",{pay:sc.macro.salary*0.6}]};
   let i=1,p=0;
   while(i<40){
     if(injects[i]){ const [t,n,o]=injects[i]; add(i,t,n,o); i++; continue; }
     if(p<sc.buildings.length){
-      const [n,set,price,rent,desc]=sc.buildings[p++]; add(i,"prop",n,{set, basePrice:price, baseRent:rent, desc});
+      const B=sc.buildings[p++]; const name = state.options.thai ? B.th : B.en;
+      add(i,"prop",name,{set:B.set, basePrice:B.price, desc:B.desc, baseCap:sc.macro.capRate, houseCost: Math.max( B.price*0.08 , sc.macro.salary*2 )});
       i++; continue;
     }
-    add(i,"prop","Local Block",{set:"lb",basePrice:220,baseRent:18,desc:"Generic mixed-use"}); i++;
+    add(i,"prop","Local Block",{set:"lb", basePrice: 4500000, desc:"Generic mixed-use", baseCap:sc.macro.capRate, houseCost: sc.macro.salary*2}); i++;
   }
 }
 
-/* ==== BOARD RENDER ==== */
+/* Stocks */
+function buildStocks(sc){
+  state.stocks = sc.stocks.map(s=>({ ...s, pos:{} }));
+}
+
+/* Layout helpers */
 function idxToGrid(i){const p=i%40;if(p<=10)return{r:11,c:11-p};if(p<=20)return{r:11-(p-10),c:1};if(p<=30)return{r:1,c:(p-20)};return{r:(p-30),c:11};}
-function adjPrice(t){const loc={lb:1,pk:1.15,or:1.25,rd:1.35,yl:1.45,gr:1.6,bl:1.9}[t.set]||1; const inf=Math.pow(1+state.macro.inflation,(state.day-1)/7); return Math.round(t.basePrice*loc*inf);}
-function currentRent(t){let base=Math.max(t.baseRent,Math.round(adjPrice(t)*0.07/10)); if(t.mortgaged) base=0; return base;}
 function renderBoard(){
   const el=$("#board"); el.innerHTML="";
   for(let i=0;i<40;i++){
     const pos=idxToGrid(i); const t=state.tiles[i];
     const d=document.createElement("div"); d.className="tile"; d.style.gridRow=pos.r; d.style.gridColumn=pos.c;
     let bar="", price="", owner="";
-    if(t.type==="prop"){ bar=`<div class="bar ${t.set}"></div>`; price=`<div class="price">${money(adjPrice(t))}</div>`; if(t.owner!=null) owner=`<div class="owner ${state.players[t.owner].color}"></div>`; }
+    if(t.type==="prop"){
+      bar=`<div class="bar ${t.set}"></div>`;
+      price=`<div class="price">${money(adjPrice(t))}${t.houses||t.hotel?` • ${t.hotel?'🏨':'🏠×'+t.houses}`:''}</div>`;
+      if(t.owner!=null) owner=`<div class="owner ${state.players[t.owner].color}"></div>`;
+    }
     d.innerHTML=`${bar}<div>${t.name}</div>${price}${owner}`;
     d.onclick=()=>inspectTile(i);
     el.appendChild(d);
   }
-  const c=document.createElement("div"); c.className="center"; c.innerHTML=`<div style="text-align:center"><div class="h1">CITY LEDGER</div><div class="tag">${DATA.scenarios[state.scenario].name} • Live Macro</div></div>`; el.appendChild(c);
+  const c=document.createElement("div"); c.className="center";
+  c.innerHTML=`<div class="centerInner"><div class="logo">CITY LEDGER</div><div class="sub">${DATA.scenarios[state.scenario].name} • Live Macro</div></div>`;
+  el.appendChild(c);
   renderTokens();
 }
 function renderTokens(){
@@ -408,70 +483,98 @@ function renderTokens(){
     const pos=idxToGrid(p.pos);
     const t=document.createElement("div");
     t.className=`token ${p.color}`;
-    const off=8*i;
-    t.style.top=`calc(((100% - 16px)/11) * ${pos.r-0.5} - ${off}px)`;
-    t.style.left=`calc(((100% - 16px)/11) * ${pos.c-0.5} + ${off}px)`;
+    const lane= i%3; const laneX = (lane-1)*8; const laneY = Math.floor(i/3)*8;
+    t.style.top = `calc(((100% - 20px)/11) * ${pos.r-0.5} - ${laneY}px)`;
+    t.style.left= `calc(((100% - 20px)/11) * ${pos.c-0.5} + ${laneX}px)`;
+    t.id=`token-${i}`;
     board.appendChild(t);
   });
 }
 
-/* ==== SIDE + LOG ==== */
+/* Prices & Rent (cap-rate based) */
+function adjPrice(t){
+  // Inflation drift weekly; location premium by set
+  const loc={lb:1.0,pk:1.15,or:1.27,rd:1.35,yl:1.45,gr:1.65,bl:1.95}[t.set]||1;
+  const inf=Math.pow(1+state.macro.inflation,(state.day-1)/7);
+  return Math.round(t.basePrice*loc*inf);
+}
+function baseMonthlyRent(t){
+  // annual NOI ~ price * cap -> monthly, then scale by houses/hotel
+  let rent = (adjPrice(t) * (t.baseCap || state.macro.capRate))/12;
+  // Houses/hotel scaling (capex raises rent): 1h=+60%, 2h=+120%, 3h=+200%, 4h=+300%, hotel=+500%
+  if(t.hotel) rent *= 6.0;
+  else if(t.houses>0){ const mult=[1,1.6,2.2,3.0,4.0][t.houses]; rent*=mult; }
+  // Full color set bonus +25%
+  const fullSet = isFullSetOwned(t.set, t.owner);
+  if(fullSet) rent*=1.25;
+  // Citywide rent holiday
+  if(state.rentDiscount) rent *= (1+state.rentDiscount.pct);
+  return Math.max(0, Math.round(rent));
+}
+function isFullSetOwned(set, owner){
+  if(owner==null) return false;
+  const all = state.tiles.filter(x=>x.type==="prop"&&x.set===set);
+  return all.length && all.every(x=>x.owner===owner);
+}
+
+/* ================== Rendering panels ================== */
 function renderPanels(){
   $("#turnTitle").innerHTML=`<strong>Turn: ${state.players[state.turn]?.emoji||""} ${state.players[state.turn]?.name||"—"}</strong>`;
-  $("#macroTag").textContent=`Inflation ${pct(state.macro.inflation)} • Rate ${pct(state.macro.rate)}`;
+  $("#macroTag").textContent=`Infl ${pct(state.macro.inflation)} • Rate ${pct(state.macro.rate)} • Cap ${pct(state.macro.capRate)}`;
   $("#dayTag").textContent=`Day ${state.day}`;
   $("#cashNow").textContent=money(current().cash);
   const wrap=$("#players"); wrap.innerHTML="";
   state.players.forEach((p,i)=>{
-    const div=document.createElement("div"); div.className="item";
-    div.innerHTML=`<div>${p.emoji} <strong>${p.name}</strong><div class="tag">Pos ${p.pos}${p.inJail?" • Detained":""}</div></div>
+    const card=document.createElement("div"); card.className="item";
+    const props=state.tiles.filter(t=>t.type==="prop"&&t.owner===i).length;
+    card.innerHTML=`<div>${p.emoji} <strong>${p.name}</strong><div class="tag">Pos ${p.pos}${p.inJail?" • Detained":""} • Props ${props}</div></div>
     <div style="text-align:right"><div>${money(p.cash)}</div><div class="tag">${p.color.toUpperCase()}</div></div>`;
-    wrap.appendChild(div);
+    wrap.appendChild(card);
   });
 }
 function renderLog(){ $("#log").textContent = state.log.map(x=>"• "+x).join("\n"); }
 function renderAll(){ renderBoard(); renderPanels(); }
-function pct(v){ return (v*100).toFixed(1)+"%"; }
-function current(){ return state.players[state.turn]; }
 
-/* ==== TURN FLOW ==== */
+/* ================== Turn flow & movement ================== */
+function current(){ return state.players[state.turn]; }
+function r(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
+
+$("#rollBtn").onclick=()=>{ if(state.phase==="await-roll"||state.phase==="post-roll"){ roll(); persist(); } };
+$("#endBtn").onclick=()=>endTurn();
+$("#passBtn").onclick=()=>openPass();
+$("#passGo").onclick=()=>closePass();
+
 function roll(){
   const p=current(); if(!p) return;
   if(p.inJail){
     const a=r(1,6), b=r(1,6); state.dice=[a,b]; log(`${p.name} rolls ${a}+${b} in Detention.`);
-    if(a===b){ p.inJail=false;p.jailTries=0; move(a+b); postMove(true); }
-    else{ p.jailTries++; if(p.jailTries>=3){ pay(p,50,"Detention fine"); p.inJail=false;p.jailTries=0; move(a+b); postMove(false);} else endTurn(); }
+    if(a===b){ p.inJail=false;p.jailTries=0; animateMove(a+b); postMove(true); }
+    else{ p.jailTries++; if(p.jailTries>=3){ pay(p,state.macro.salary*0.2,"Detention fine"); p.inJail=false;p.jailTries=0; animateMove(a+b); postMove(false);} else endTurn(); }
     return;
   }
   const a=r(1,6), b=r(1,6); state.dice=[a,b]; log(`${p.name} rolls ${a}+${b}.`);
-  move(a+b);
+  animateMove(a+b);
   if(a===b){ state.doubles++; if(state.doubles===3){ sendToJail(p); endTurn(true); } else postMove(true); }
   else { state.doubles=0; postMove(false); }
 }
-function move(steps){
-  const p=current(); const old=p.pos; p.pos=(p.pos+steps)%40; renderTokens();
-  if(p.pos<old){ p.cash+=200; log(`${p.name} collects ${money(200)} for passing GO.`); dailyFinance(p); }
-  onLand();
+
+function animateMove(steps){
+  // move tile-by-tile with animation for smoother feel
+  const p=current(); let remaining=steps;
+  const stepOnce=()=>{
+    if(remaining<=0){ onLand(); return; }
+    const old=p.pos; p.pos=(p.pos+1)%40; renderTokens();
+    if(p.pos===0){ p.cash+=state.macro.salary; log(`${p.name} collects ${money(state.macro.salary)} for passing GO.`); dailyFinance(p); }
+    remaining--; setTimeout(stepOnce, 200); // speed
+  };
+  stepOnce();
 }
-function onLand(){
-  const p=current(); const t=state.tiles[p.pos];
-  if(!t) return;
-  setStatus(`${p.name} → ${t.name}`);
-  switch(t.type){
-    case "prop":
-      if(t.owner==null){ offerBuy(t); }
-      else if(t.owner!==state.turn){ const r=currentRent(t); pay(p,r,`Rent for ${t.name}`); state.players[t.owner].cash+=r; }
-      break;
-    case "bank": openBank(); break;
-    case "stock": if(state.options.stocks) openStocks(); break;
-    case "casino": if(state.options.casino) openCasino(); break;
-    case "chance": newsCard("Macro blip"); break;
-    case "chest": lifeCard("Unexpected bill"); break;
-    case "tax": pay(p,t.pay||150,"Taxes"); break;
-    case "goto": sendToJail(p); break;
-  }
+
+function postMove(double){
+  state.phase="post-roll";
+  hint(double?"Doubles! Roll again or End.":"Buy/Manage or End.");
+  renderPanels();
 }
-function postMove(double){ state.phase="post-roll"; hint(double?"Doubles! Roll again or end.":"Buy/Manage or End."); renderPanels(); }
 function endTurn(silent=false){
   macroTick();
   state.turn=(state.turn+1)%state.players.length;
@@ -479,9 +582,236 @@ function endTurn(silent=false){
   renderPanels(); if(!silent) openPass(); persist();
 }
 
-/* ==== MONEY ==== */
-function r(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
+/* ================== Tile landing ================== */
+function onLand(){
+  const p=current(); const t=state.tiles[p.pos];
+  if(!t) return;
+  setStatus(`${p.name} → ${t.name}`);
+  switch(t.type){
+    case "prop":
+      if(t.owner==null){ offerBuyOrAuction(t); }
+      else if(t.owner!==state.turn && !t.mortgaged){ const rent=baseMonthlyRent(t); transfer(p, state.players[t.owner], rent, `Rent for ${t.name}`); }
+      break;
+    case "bank": openBank(); break;
+    case "stock": if(state.options.stocks) openStocks(); break;
+    case "casino": if(state.options.casino) openCasino(); break;
+    case "chance": newsCard(); break;
+    case "chest": lifeCard(); break;
+    case "tax": pay(p, t.pay||state.macro.salary*0.5, "Taxes"); break;
+    case "goto": sendToJail(p); break;
+  }
+}
+
+/* ================== Buy / Auction / Build ================== */
+function offerBuyOrAuction(tile){
+  const p=current(); const price=adjPrice(tile);
+  showModal(`<h3>Acquire ${tile.name}?</h3>
+    <p class="tag">${tile.desc||""}</p>
+    <p>Price ${money(price)} • Base rent ${money(baseMonthlyRent(tile))}</p>`,
+  [
+    {label:"Buy",primary:true,cb:()=>{ if(p.cash>=price){ pay(p,price,`Bought ${tile.name}`); tile.owner=state.turn; closeModal(); renderAll(); } else { closeModal(); showModal(`<h3>Need funds</h3><p>Open Bank for a loan?</p>`,[{label:"Open Bank",primary:true,cb:()=>{closeModal();openBank();}},{label:"Cancel",cb:closeModal}]); }}},
+    {label:"Auction",cb:()=>{ closeModal(); startAuction(tile, price); }},
+    {label:"Skip",cb:closeModal}
+  ]);
+}
+
+function startAuction(tile, startPrice){
+  let currentBid = Math.max(startPrice*0.4, 1);
+  let bidder = null;
+  let passed = new Set();
+  const n = state.players.length;
+
+  const renderAuction=()=>{
+    const rows = state.players.map((pl,idx)=>`
+      <div class="item">
+        <div>${pl.emoji} <strong>${pl.name}</strong> <span class="tag">Cash ${money(pl.cash)}</span></div>
+        <div>
+          <button class="btn" data-i="${idx}" data-act="bid">Bid +${money(startPrice*0.05)}</button>
+          <button class="btn warn" data-i="${idx}" data-act="pass">Pass</button>
+        </div>
+      </div>`).join("");
+    showModal(`<h3>Auction: ${tile.name}</h3>
+      <p>Current: <strong>${money(currentBid)}</strong> ${bidder!=null?`by ${state.players[bidder].name}`:"(no bidder yet)"}</p>
+      ${rows}`,
+      [{label:"Close (cancel)",cb:closeModal}]
+    );
+    $("#modalContent").onclick=(e)=>{
+      const btn=e.target.closest("button[data-act]"); if(!btn) return;
+      const idx=+btn.getAttribute("data-i"); const act=btn.getAttribute("data-act");
+      if(act==="bid"){
+        const inc = Math.max(startPrice*0.05, state.macro.salary*0.05);
+        const newBid=currentBid+inc;
+        if(state.players[idx].cash>=newBid){ currentBid=newBid; bidder=idx; renderAuction(); }
+      } else {
+        passed.add(idx);
+        if(passed.size===n- (bidder==null?0:1)){ // everyone except highest passed
+          finishAuction();
+        }
+        else renderAuction();
+      }
+    };
+  };
+  const finishAuction=()=>{
+    if(bidder==null){ closeModal(); log("Auction ended with no winner."); return; }
+    const winner=state.players[bidder];
+    if(winner.cash>=currentBid){
+      winner.cash-=currentBid; tile.owner=bidder; log(`Auction won by ${winner.name} for ${money(currentBid)} (${tile.name}).`);
+      renderAll(); closeModal();
+    } else { closeModal(); log("Winner lacks funds. Auction void."); }
+  };
+  renderAuction();
+}
+
+/* Build / Manage */
+$("#buyBtn").onclick=()=>{ const t=state.tiles[current().pos]; if(t && t.type==="prop" && t.owner==null){ offerBuyOrAuction(t); } else openPortfolio(); };
+
+function openPortfolio(){
+  const i=state.turn, p=current();
+  const props=state.tiles.filter(t=>t.type==="prop"&&t.owner===i);
+  const rows=props.map(t=>{
+    const price=adjPrice(t), rent=baseMonthlyRent(t);
+    const buildDisabled = !isFullSetOwned(t.set, i);
+    return `<div class="item">
+      <div><strong>${t.name}</strong>
+        <div class="tag">${t.desc||""}</div>
+        <div class="tag">Rent ${money(rent)} • Value ${money(price)} ${t.mortgaged?'• Mortgaged':''}</div>
+      </div>
+      <div>
+        <button class="btn" data-act="mort" data-name="${t.name}">Mortgage</button>
+        <button class="btn" data-act="unmort" data-name="${t.name}">Unmortgage</button>
+        <button class="btn" data-act="house" data-name="${t.name}" ${buildDisabled?'disabled':''}>Build House (${money(t.houseCost)})</button>
+        <button class="btn" data-act="hotel" data-name="${t.name}" ${t.houses<4||buildDisabled?'disabled':''}>Build Hotel (${money(t.houseCost*2)})</button>
+      </div>
+    </div>`;
+  }).join("") || `<div class="tag">No properties</div>`;
+  showModal(`<h3>${p.name} — Portfolio</h3>${rows}`,[{label:"Close",primary:true,cb:closeModal}]);
+  $("#modalContent").onclick=(e)=>{
+    const b=e.target.closest("button[data-act]"); if(!b) return;
+    const name=b.getAttribute("data-name"); const t=state.tiles.find(x=>x.name===name);
+    if(!t) return;
+    const act=b.getAttribute("data-act");
+    if(act==="mort"){ if(!t.mortgaged){ t.mortgaged=true; p.cash+=adjPrice(t)*0.5; log(`Mortgaged ${t.name}.`);} }
+    if(act==="unmort"){ if(t.mortgaged){ const cost=adjPrice(t)*0.5*1.1; if(p.cash>=cost){ p.cash-=cost; t.mortgaged=false; log(`Unmortgaged ${t.name}.`);} else log("Not enough cash."); } }
+    if(act==="house"){
+      if(!t.hotel && t.houses<4 && p.cash>=t.houseCost){ p.cash-=t.houseCost; t.houses++; log(`Built house on ${t.name}.`);} else log("Cannot build house.");
+    }
+    if(act==="hotel"){
+      if(!t.hotel && t.houses===4 && p.cash>=t.houseCost*2){ p.cash-=t.houseCost*2; t.hotel=true; t.houses=0; log(`Built hotel on ${t.name}.`);} else log("Cannot build hotel.");
+    }
+    renderAll(); persist(); openPortfolio();
+  };
+}
+
+/* ================== Stocks (rows with buy/sell) ================== */
+$("#stocksBtn").onclick=()=>openStocks();
+function openStocks(){
+  const rows = state.stocks.map(s=>{
+    const qty=s.pos[state.turn]||0;
+    return `<div class="item">
+      <div><strong>${s.tkr}</strong> ${s.name}<div class="tag">${s.sector}</div></div>
+      <div style="text-align:right">
+        <div>${money(s.px)}</div><div class="tag">You: ${qty} sh</div>
+      </div>
+      <div class="row" style="gap:6px">
+        <input class="input" style="width:110px" placeholder="Qty" data-qty="${s.tkr}" />
+        <button class="btn" data-act="buy" data-t="${s.tkr}">Buy</button>
+        <button class="btn warn" data-act="sell" data-t="${s.tkr}">Sell</button>
+      </div>
+    </div>`;
+  }).join("");
+  showModal(`<h3>Stock Exchange</h3>
+  <p class="tag">Prices drift each turn. Sector & macro shocks apply. Buy/sell at last price.</p>
+  ${rows}`,[{label:"Close",primary:true,cb:closeModal}]);
+  $("#modalContent").onclick=(e)=>{
+    const b=e.target.closest("button[data-act]"); if(!b) return;
+    const t=b.getAttribute("data-t"); const act=b.getAttribute("data-act");
+    const input = $("#modalContent").querySelector(`input[data-qty="${t}"]`);
+    const q = Math.max(1, Number(input.value||0));
+    const s = state.stocks.find(x=>x.tkr===t); if(!s) return;
+    const p = current();
+    if(act==="buy"){
+      const cost=s.px*q; if(p.cash>=cost){ p.cash-=cost; s.pos[state.turn]=(s.pos[state.turn]||0)+q; log(`Bought ${q} ${t} for ${money(cost)}.`); }
+      else log("Insufficient cash.");
+    } else {
+      const have=s.pos[state.turn]||0; if(have>=q){ s.pos[state.turn]=have-q; p.cash+=s.px*q; log(`Sold ${q} ${t} for ${money(s.px*q)}.`); }
+      else log("Not enough shares.");
+    }
+    renderPanels(); persist();
+  };
+}
+
+/* ================== Bank & Casino (light) ================== */
+$("#bankBtn").onclick=()=>openBank();
+function openBank(){
+  const p=current();
+  showModal(`<h3>City Bank</h3>
+    <p>Policy rate ${pct(state.macro.rate)} • Deposits earn daily interest.</p>
+    <div class="row" style="gap:8px"><input id="amt" class="input" placeholder="Amount" /></div>
+    <div class="row" style="gap:8px;margin-top:8px">
+      <button class="btn" id="loan">Take Loan</button>
+      <button class="btn" id="dep">Deposit</button>
+      <button class="btn" id="with">Withdraw</button>
+    </div>`,
+    [{label:"Close",primary:true,cb:closeModal}]);
+  $("#loan").onclick=()=>{ const a=Number($("#amt").value||0); if(a>0){ p.cash+=a; p.loans.push({principal:a,rate:Math.max(state.macro.rate+0.03,0.05)}); log(`Loan +${money(a)}.`); closeModal(); renderPanels(); persist(); }};
+  $("#dep").onclick=()=>{ const a=Number($("#amt").value||0); if(a>0&&p.cash>=a){ p.cash-=a; p.deposits=(p.deposits||0)+a; log(`Deposited ${money(a)}.`); closeModal(); renderPanels(); persist(); }};
+  $("#with").onclick=()=>{ const a=Number($("#amt").value||0); if(a>0&&(p.deposits||0)>=a){ p.deposits-=a; p.cash+=a; log(`Withdrew ${money(a)}.`); closeModal(); renderPanels(); persist(); }};
+}
+
+$("#casinoBtn").onclick=()=>openCasino();
+function openCasino(){
+  const p=current();
+  showModal(`<h3>Casino</h3>
+  <div class="row" style="gap:8px"><input id="bet" class="input" placeholder="Bet amount" /></div>
+  <div class="row" style="gap:8px;margin-top:8px"><button class="btn" id="coin">Coin (49%)</button><button class="btn" id="roll10">10x (8%)</button></div>`,
+  [{label:"Close",primary:true,cb:closeModal}]);
+  const val=()=>Number($("#bet").value||0);
+  $("#coin").onclick=()=>{ const b=val(); if(b>0&&p.cash>=b){ if(Math.random()<0.49){ p.cash+=b; log("Coin WIN"); } else { p.cash-=b; log("Coin LOSE"); } renderPanels(); persist(); }};
+  $("#roll10").onclick=()=>{ const b=val(); if(b>0&&p.cash>=b){ if(Math.random()<0.08){ p.cash+=9*b; log("10x hit!"); } else { p.cash-=b; log("Bust"); } renderPanels(); persist(); }};
+}
+
+/* ================== Cards & Macro ================== */
+function newsCard(){
+  const shocks=["Energy spike (+inflation)","Tech rally (+stocks)","Rent holiday (-25%, 2 turns)","Index +2%"];
+  const pick=shocks[Math.floor(Math.random()*shocks.length)];
+  if(pick.includes("Energy")) state.macro.inflation=Math.max(0,state.macro.inflation+0.01);
+  if(pick.includes("Tech")) state.stocks.forEach(s=>{ if(s.sector==="Tech"||s.sector==="AutoTech") s.px*=1.03; });
+  if(pick.includes("holiday")) state.rentDiscount={pct:-0.25,left:2};
+  if(pick.includes("Index")) state.stocks.forEach(s=>s.px*=1.02);
+  log(`[News] ${pick}.`);
+}
+function lifeCard(){
+  const events=[["Salary Bonus", +state.macro.salary*0.8],["Medical Bill", -state.macro.salary*0.5],["Tax Refund", +state.macro.salary*0.6]];
+  const e=events[Math.floor(Math.random()*events.length)];
+  if(e[1]>0) current().cash+=e[1]; else current().cash+=e[1];
+  log(`[Life] ${e[0]} ${money(Math.abs(e[1]))}${e[1]>0?'+':'-'} .`);
+  renderPanels();
+}
+
+function macroTick(){
+  // inflation drift
+  state.macro.inflation = Math.max(0, state.macro.inflation + (Math.random()*0.006-0.002));
+  state.macro.rate = Math.max(0, Math.min(0.12, state.macro.rate + (state.macro.inflation-0.02)*0.15));
+  // stocks drift
+  state.stocks.forEach(s=>{
+    const daily=(Math.random()*2-1)*s.vol; // -vol..+vol
+    const macroShock = -(state.macro.inflation-0.02)*s.beta*50;
+    const pct = daily*0.01 + macroShock*0.0005;
+    s.px = Math.max(1, s.px*(1+pct));
+  });
+  if(state.rentDiscount){ state.rentDiscount.left--; if(state.rentDiscount.left<=0) state.rentDiscount=null; }
+  // deposits/loans daily calc
+  state.players.forEach(p=>dailyFinance(p,true));
+  state.day++; renderPanels();
+}
+function dailyFinance(p, silent){
+  const dep=p.deposits||0; if(dep>0){ const inc=dep*(state.macro.rate/365); p.deposits+=inc; if(!silent) log(`Deposit interest ${money(inc)}.`); }
+  p.loans.forEach(l=>{ l.principal += l.principal*(l.rate/365); });
+}
+
+/* ================== Payments & Insolvency ================== */
 function pay(p,amt,tag){ p.cash-=amt; if(tag) log(`${tag} (${money(amt)})`); if(p.cash<0) insolvent(p); renderPanels(); }
+function transfer(from,to,amt,tag){ from.cash-=amt; to.cash+=amt; log(`${tag}: ${from.name} → ${to.name} ${money(amt)}`); if(from.cash<0) insolvent(from); renderPanels(); }
 function insolvent(p){
   showModal(`<h3>${p.name} is Insolvent</h3><p>Mortgage properties or declare bankruptcy.</p>`,
   [{label:"Auto-mortgage",cb:()=>{autoMortgage(p); closeModal();}},
@@ -491,112 +821,28 @@ function insolvent(p){
 function autoMortgage(p){
   const idx=state.players.indexOf(p);
   const props=state.tiles.filter(t=>t.type==="prop"&&t.owner===idx&&!t.mortgaged).sort((a,b)=>adjPrice(b)-adjPrice(a));
-  for(const t of props){ t.mortgaged=true; p.cash+=Math.round(adjPrice(t)*0.5); log(`Mortgaged ${t.name}.`); if(p.cash>=0) break; }
+  for(const t of props){ t.mortgaged=true; p.cash+=adjPrice(t)*0.5; log(`Mortgaged ${t.name}.`); if(p.cash>=0) break; }
   renderAll();
 }
 function bankrupt(p){
   const idx=state.players.indexOf(p);
-  state.tiles.forEach(t=>{ if(t.owner===idx){ t.owner=null; t.mortgaged=false; }});
+  state.tiles.forEach(t=>{ if(t.owner===idx){ t.owner=null; t.mortgaged=false; t.houses=0; t.hotel=false; }});
+  state.stocks.forEach(s=>{ s.pos[idx]=0; });
   state.players.splice(idx,1);
   if(state.turn>=state.players.length) state.turn=0;
-  if(state.players.length===1){ showModal(`<h3>${state.players[0].name} Wins!</h3>`,[{label:"OK",primary:true,cb:closeModal}]); }
+  if(state.players.length===1) showModal(`<h3>${state.players[0].name} Wins!</h3>`,[{label:"OK",primary:true,cb:closeModal}]);
   renderAll();
 }
 
-/* ==== BUY / MANAGE ==== */
-function offerBuy(t){
-  const p=current(); const price=adjPrice(t);
-  showModal(`<h3>Acquire ${t.name}?</h3><p>${t.desc||""}</p><p>Price ${money(price)} • Rent now ${money(currentRent(t))}</p>`,
-  [{label:"Buy",primary:true,cb:()=>{ if(p.cash>=price){ p.cash-=price; t.owner=state.turn; log(`${p.name} bought ${t.name}.`); closeModal(); renderAll(); } else { closeModal(); showModal(`<h3>Need funds</h3><p>Open Bank for a loan?</p>`,[{label:"Open Bank",primary:true,cb:()=>{closeModal();openBank();}},{label:"Cancel",cb:closeModal}]); }}},
-   {label:"Skip",cb:closeModal}]);
-}
-function openPortfolio(){
-  const i=state.turn, p=current();
-  const rows=state.tiles.filter(t=>t.type==="prop"&&t.owner===i).map(t=>`
-    <div class="item">
-      <div><strong>${t.name}</strong><div class="tag">${t.desc||""}</div><div class="tag">Rent ${money(currentRent(t))}${t.mortgaged?" • Mortgaged":""}</div></div>
-      <div>
-        <button class="btn" data-act="mort" data-name="${t.name}">Mortgage</button>
-        <button class="btn" data-act="unmort" data-name="${t.name}">Unmortgage</button>
-      </div>
-    </div>`).join("") || `<div class="tag">No properties</div>`;
-  showModal(`<h3>${p.name} — Portfolio</h3>${rows}`,[{label:"Close",primary:true,cb:closeModal}]);
-  $("#modalContent").addEventListener("click",e=>{
-    const b=e.target.closest("button[data-act]"); if(!b) return;
-    const t=state.tiles.find(x=>x.name===b.getAttribute("data-name"));
-    if(!t) return;
-    if(b.getAttribute("data-act")==="mort" && !t.mortgaged && t.owner===i){ t.mortgaged=true; p.cash+=Math.round(adjPrice(t)*0.5); log(`Mortgaged ${t.name}.`); }
-    if(b.getAttribute("data-act")==="unmort" && t.mortgaged && t.owner===i){ const cost=Math.round(adjPrice(t)*0.5*1.1); if(p.cash>=cost){ p.cash-=cost; t.mortgaged=false; log(`Unmortgaged ${t.name}.`);} else { log("Not enough cash."); } }
-    renderAll(); persist(); openPortfolio();
-  },{once:true});
+/* ================== Inspect ================== */
+function inspectTile(i){
+  const t=state.tiles[i];
+  let body = `<p>Type: ${t.type.toUpperCase()}</p>`;
+  if(t.type==="prop"){ body += `<p>${t.desc||""}</p><p>Value: ${money(adjPrice(t))} • Rent now: ${money(baseMonthlyRent(t))}</p>`; }
+  showModal(`<h3>${t.name}</h3>${body}`,[{label:"Close",primary:true,cb:closeModal}]);
 }
 
-/* ==== BANK / STOCKS / CASINO (lightweight UI hooks) ==== */
-function openBank(){
-  const p=current();
-  showModal(`<h3>City Bank</h3>
-    <p>Policy rate ${pct(state.macro.rate)}</p>
-    <div class="row"><input id="amt" class="input" placeholder="Amount" /></div>
-    <div class="row" style="margin-top:8px;gap:8px">
-      <button class="btn" id="loan">Take Loan</button>
-      <button class="btn" id="dep">Deposit</button>
-      <button class="btn" id="with">Withdraw</button>
-    </div>`,
-    [{label:"Close",primary:true,cb:closeModal}]);
-  $("#loan").onclick=()=>{ const a=Number($("#amt").value||0); if(a>0){ p.cash+=a; log(`Loan +${money(a)}.`); closeModal(); renderPanels(); persist(); }};
-  $("#dep").onclick=()=>{ const a=Number($("#amt").value||0); if(a>0&&p.cash>=a){ p.cash-=a; p.deposits=(p.deposits||0)+a; log(`Deposited ${money(a)}.`); closeModal(); renderPanels(); persist(); }};
-  $("#with").onclick=()=>{ const a=Number($("#amt").value||0); if(a>0&&(p.deposits||0)>=a){ p.deposits-=a; p.cash+=a; log(`Withdrew ${money(a)}.`); closeModal(); renderPanels(); persist(); }};
-}
-function openStocks(){
-  showModal(`<h3>Stock Exchange</h3><p>Prototype: coming next pass (UI wired).</p>`,[{label:"Close",primary:true,cb:closeModal}]);
-}
-function openCasino(){
-  showModal(`<h3>Casino</h3>
-  <div class="row"><input id="bet" class="input" placeholder="Bet amount" /></div>
-  <div class="row" style="gap:8px;margin-top:8px"><button class="btn" id="coin">Coin (49%)</button><button class="btn" id="roll10">10x (8%)</button></div>`,
-  [{label:"Close",primary:true,cb:closeModal}]);
-  const p=current(), val=()=>Number($("#bet").value||0);
-  $("#coin").onclick=()=>{ const b=val(); if(b>0&&p.cash>=b){ if(Math.random()<0.49){ p.cash+=b; log("Coin WIN"); } else { p.cash-=b; log("Coin LOSE"); } renderPanels(); persist(); }};
-  $("#roll10").onclick=()=>{ const b=val(); if(b>0&&p.cash>=b){ if(Math.random()<0.08){ p.cash+=9*b; log("10x hit!"); } else { p.cash-=b; log("Bust"); } renderPanels(); persist(); }};
-}
-
-/* ==== CARDS & MACRO ==== */
-function lifeCard(msg){ log(`[Life] ${msg}.`); }
-function newsCard(msg){ log(`[News] ${msg}.`); }
-function macroTick(){
-  // simple drift
-  state.macro.inflation = Math.max(0, state.macro.inflation + (Math.random()*0.006-0.002));
-  state.macro.rate = Math.max(0, Math.min(0.12, state.macro.rate + (state.macro.inflation-0.02)*0.15));
-  state.day++; renderPanels();
-}
-function dailyFinance(p){
-  const dep=p.deposits||0; if(dep>0){ const inc=dep*(state.macro.rate/365); p.deposits+=inc; log(`Deposit interest ${money(inc)}.`); }
-}
-
-/* ==== UI WIRING ==== */
-$("#rollBtn").onclick=()=>{ if(state.phase==="await-roll"||state.phase==="post-roll"){ roll(); persist(); } };
-$("#endBtn").onclick=()=>endTurn();
-$("#passBtn").onclick=()=>openPass();
-$("#passGo").onclick=()=>closePass();
-$("#buyBtn").onclick=()=>{ const t=state.tiles[current().pos]; if(t && t.type==="prop" && t.owner==null){ offerBuy(t); } else openPortfolio(); };
-$("#portfolioBtn").onclick=openPortfolio;
-$("#bankBtn").onclick=openBank;
-$("#casinoBtn").onclick=openCasino;
-$("#stocksBtn").onclick=openStocks;
-$("#helpBtn").onclick=()=>{ showModal(`<h3>How to Play</h3><p>Roll, move, buy. Rent floats with inflation. Use Bank if you need liquidity. Pass iPad between turns.</p>`,[{label:"Close",primary:true,cb:closeModal}]); };
-$("#gearBtn").onclick=()=>{ showModal(`<h3>Settings</h3>
-  <label class="item"><span>Fast Play</span><input type="checkbox" ${state.options.fast?"checked":""} id="setFast"></label>
-  <label class="item"><span>Enable Casino</span><input type="checkbox" ${state.options.casino?"checked":""} id="setCasino"></label>
-  <label class="item"><span>Enable Stocks</span><input type="checkbox" ${state.options.stocks?"checked":""} id="setStocks"></label>
-  <label class="item"><span>Thai Labels (β)</span><input type="checkbox" ${state.options.thai?"checked":""} id="setThai"></label>
-`,[{label:"Close",primary:true,cb:closeModal}]);
-  $("#setFast").onchange=e=>state.options.fast=e.target.checked;
-  $("#setCasino").onchange=e=>state.options.casino=e.target.checked;
-  $("#setStocks").onchange=e=>state.options.stocks=e.target.checked;
-  $("#setThai").onchange=e=>state.options.thai=e.target.checked;
-};
-
-/* ==== MODAL + PASS ==== */
+/* ================== Modal / Pass / Save ================== */
 function showModal(html, buttons=[]){
   const box=$("#modalContent"); box.innerHTML=html+`<div class="btns">${buttons.map((b,i)=>`<button class="btn ${b.class||""} ${b.primary?"primary":""}" data-i="${i}">${b.label}</button>`).join("")}</div>`;
   $("#modal").classList.add("open");
@@ -605,16 +851,30 @@ function showModal(html, buttons=[]){
 function closeModal(){ $("#modal").classList.remove("open"); }
 function openPass(){ $("#passTitle").textContent=`Pass iPad to ${state.players[(state.turn+1)%state.players.length].name}`; $("#pass").classList.add("open"); }
 function closePass(){ $("#pass").classList.remove("open"); }
+function persist(){ localStorage.setItem("city-ledger-deluxe", JSON.stringify(state)); }
+function load(){ const raw=localStorage.getItem("city-ledger-deluxe"); if(!raw) return; const s=JSON.parse(raw); Object.assign(state,s); }
 
-/* ==== SAVE / LOAD ==== */
-function persist(){ localStorage.setItem("city-ledger-v1", JSON.stringify(state)); }
-function load(){ const raw=localStorage.getItem("city-ledger-v1"); if(!raw) return; const s=JSON.parse(raw); Object.assign(state,s); }
+/* ================== Settings (in-game) ================== */
+$("#gearBtn").onclick=()=>{ showModal(`<h3>Settings</h3>
+  <label class="item"><span>Fast Play</span><input type="checkbox" ${state.options.fast?"checked":""} id="setFast"></label>
+  <label class="item"><span>Enable Casino</span><input type="checkbox" ${state.options.casino?"checked":""} id="setCasino"></label>
+  <label class="item"><span>Enable Stocks</span><input type="checkbox" ${state.options.stocks?"checked":""} id="setStocks"></label>
+  <label class="item"><span>Thai names</span><input type="checkbox" ${state.options.thai?"checked":""} id="setThai"></label>
+`,[{label:"Close",primary:true,cb:closeModal}]);
+  $("#setFast").onchange=e=>state.options.fast=e.target.checked;
+  $("#setCasino").onchange=e=>state.options.casino=e.target.checked;
+  $("#setStocks").onchange=e=>state.options.stocks=e.target.checked;
+  $("#setThai").onchange=e=>{
+    state.options.thai=e.target.checked;
+    // Rebuild board names in current scenario:
+    const sc=DATA.scenarios[state.scenario];
+    buildBoard(sc); renderBoard();
+  };
+};
+
+/* ================== Boot ================== */
 if("serviceWorker" in navigator){ window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js")); }
-
-/* ==== BOOT ==== */
-function boot(){
-  show("#home");
-}
+function boot(){ show("#home"); }
 boot();
 </script>
 </body>
